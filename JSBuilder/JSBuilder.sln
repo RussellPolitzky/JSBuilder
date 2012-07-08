@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "JSBuilder", "JSBuilder\JSBuilder.fsproj", "{CC8D2A2D-24FC-4CFD-AA74-D0664E968AA5}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "JSBuilder.Tests", "..\JSBuilder.Tests\JSBuilder.Tests.fsproj", "{696571E8-1719-4E18-82DF-3D53476BE6A9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleFiles", "..\SampleFiles\SampleFiles.csproj", "{BC5322A5-3A9E-4324-A0C2-8AD4895CEC42}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{696571E8-1719-4E18-82DF-3D53476BE6A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{696571E8-1719-4E18-82DF-3D53476BE6A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{696571E8-1719-4E18-82DF-3D53476BE6A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{696571E8-1719-4E18-82DF-3D53476BE6A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC5322A5-3A9E-4324-A0C2-8AD4895CEC42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC5322A5-3A9E-4324-A0C2-8AD4895CEC42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC5322A5-3A9E-4324-A0C2-8AD4895CEC42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC5322A5-3A9E-4324-A0C2-8AD4895CEC42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC8D2A2D-24FC-4CFD-AA74-D0664E968AA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC8D2A2D-24FC-4CFD-AA74-D0664E968AA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC8D2A2D-24FC-4CFD-AA74-D0664E968AA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC8D2A2D-24FC-4CFD-AA74-D0664E968AA5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
