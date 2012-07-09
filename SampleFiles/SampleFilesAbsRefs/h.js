@@ -1,0 +1,1 @@
+﻿/// <reference path="!http://www.test.com/thisscript.js" />

@@ -35,8 +35,11 @@ let getReferencesInFile =
 /// specifies the root script. 
 let _getAllReferencedFiles (refFinder:string -> string[]) rootFile = 
 
+    let inline isAnAbsolutePath (path:string) = 
+        path.StartsWith("!")
+
     let testForCircularReference pathStack = 
-        if (pathStack |> Seq.hasDuplicates)
+        if pathStack |> Seq.hasDuplicates
         then
             let pathWithCircRef = pathStack |> Seq.toSingleSringWithSep (" -> " + Environment.NewLine)
             let message = sprintf "Circular reference found: %s" pathWithCircRef
@@ -50,10 +53,14 @@ let _getAllReferencedFiles (refFinder:string -> string[]) rootFile =
         |> refFinder 
         |> Array.rev // Ensure that the refs in a given file appear in the final list in the order given
         |> Array.iter (fun relPathToDep -> 
-                          let fullPath = calculatePath rootpth relPathToDep
-                          files.Add(fullPath)
-                          let nameAndDir = getNameAndDirectory fullPath
-                          _getAllReferencedFiles files pathStack nameAndDir.Directory nameAndDir.Name) 
+                           match relPathToDep with
+                           | pth when pth |> isAnAbsolutePath -> 
+                                 files.Add(relPathToDep) 
+                           | _ ->
+                                 let fullPath = calculatePath rootpth relPathToDep
+                                 files.Add(fullPath)
+                                 let nameAndDir = getNameAndDirectory fullPath
+                                 _getAllReferencedFiles files pathStack nameAndDir.Directory nameAndDir.Name)
         pathStack.Pop() |> ignore // Not sure how to turn this into tail recursion - how can I use a continuation here?
                                   
     let allFiles = new List<string>() 
@@ -72,7 +79,7 @@ let getAllReferencedFiles pathToRootScript =
 
 /// Finds the unique set of scrips in the 
 /// required load order from the set of 
-/// those refrenced by the tree formed 
+/// those referenced by the tree formed 
 /// by the references in each file.
 /// This version is not intended to be used 
 /// directly and it allows injection of a
@@ -81,7 +88,7 @@ let _getReferencedScriptsInLoadOrder (refFileLoader:string -> List<string>) path
     let setOfScripts = new HashSet<string>()
     let isAlreadyInList script = 
         setOfScripts.Add(script) // want the boolean result from this.
-    refFileLoader @"ComplexDepsSampleFiles\a.js"
+    refFileLoader pathToRootScript
     |> List.ofSeq 
     |> List.rev
     |> List.filter (fun script -> script |> isAlreadyInList)

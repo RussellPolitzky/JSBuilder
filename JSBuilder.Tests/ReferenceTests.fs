@@ -16,8 +16,12 @@ type ``When finding references in JS files``() =
     [<TestMethod>]        
     member this.``should be able to find refs in js files``() =
         getReferencesInFile "JsTestFile.js"
-        |> Seq.toSingleSringWithSep ","
-        |> Equals "../../Me/testFile.js,Test/James.js,Test/Joyce.js"
+        |> Seq.toSingleSringWithSep "\r\n"
+        |> Equals @"../../Me/testFile.js
+Test/James.js
+Test/Joyce.js
+!http://some.web.site/hello.js
+!directory/anotherscript.js"
 
     //
     //       a
@@ -34,6 +38,7 @@ type ``When finding references in JS files``() =
         |> Seq.map (fun i -> Path.GetFileName(i)) 
         |> Seq.toSingleSringWithSep ","
         |> Equals "a.js,b.js,g.js,h.js,c.js,d.js,f.js,e.js"
+
 
 
     //
@@ -143,39 +148,37 @@ Debug/ComplexDepsSampleFiles/a.js"
 <script src=""Debug/ComplexDepsSampleFiles/b.js"" type=""text/javascript""></script>
 <script src=""Debug/ComplexDepsSampleFiles/a.js"" type=""text/javascript""></script>"   
 
-// todo:
-//    //
-//    //        a
-//    //       / \
-//    //      b   c
-//    //     / \ / \
-//    //    g   e   d
-//    //   /   / \   \
-//    //  h___/   \___f
-//    //
-//    // Some JavaSctipt files have references to scripts that 
-//    // should be loaded from absolute URLs.  These should not
-//    // be altered by any build tool.  These URLs may be idenitifed
-//    // by a leading "!".  An example reference is as follow:
-//    // /// <reference path="!/some/script.js" />
-//    [<TestMethod>]        
-//    member this.``should be able to deal with absolute http refs in js files``() =
-//        let pathToRootScript = @"ComplexDepsSampleFiles\a.js" 
-//        let absoluteAppRootPath = 
-//            (Path.GetFullPath pathToRootScript)
-//              .Replace(@"\" + pathToRootScript, String.Empty)
-//        buildIncludesSectionFor pathToRootScript absoluteAppRootPath
-//        |> Equals @"<script src=""Debug/ComplexDepsSampleFiles/h.js"" type=""text/javascript""></script>
-//<script src=""Debug/ComplexDepsSampleFiles/f.js"" type=""text/javascript""></script>
-//<script src=""Debug/ComplexDepsSampleFiles/e.js"" type=""text/javascript""></script>
-//<script src=""Debug/ComplexDepsSampleFiles/subdir/g.js"" type=""text/javascript""></script>
-//<script src=""Debug/ComplexDepsSampleFiles/b.js"" type=""text/javascript""></script>
-//<script src=""Debug/ComplexDepsSampleFiles/d.js"" type=""text/javascript""></script>
-//<script src=""Debug/ComplexDepsSampleFiles/c.js"" type=""text/javascript""></script>
-//<script src=""Debug/ComplexDepsSampleFiles/a.js"" type=""text/javascript""></script>"
-//
-//
 
-// todo:  Ensure that the order of references as given in a file 
-// stay the same. 
+    //
+    //        a
+    //       / \
+    //      b   c
+    //     / \ / \
+    //    g   e   d
+    //   /   / \   \
+    //  h___/   \___f
+    //
+    // Some JavaScript files have references to scripts that 
+    // should be loaded from absolute URLs.  These should not
+    // be altered by the build tool.  These URLs may be idenitifed
+    // by a leading "!".  An example reference is as follows:
+    // /// <reference path="!/some/script.js" />
+    [<TestMethod>]        
+    member this.``should be able to deal with absolute http refs in js files``() =
+        let pathToRootScript = @"SampleFilesAbsRefs\a.js" 
+        let absoluteAppRootPath = 
+            (Path.GetFullPath pathToRootScript)
+              .Replace(@"\" + pathToRootScript, String.Empty)
+        buildIncludesSectionFor pathToRootScript absoluteAppRootPath
+        |> Equals @"<script src=""Debug/SampleFilesAbsRefs/f.js"" type=""text/javascript""></script>
+<script src=""http://www.test.com/thisscript.js"" type=""text/javascript""></script>
+<script src=""Debug/SampleFilesAbsRefs/h.js"" type=""text/javascript""></script>
+<script src=""Debug/SampleFilesAbsRefs/e.js"" type=""text/javascript""></script>
+<script src=""Debug/SampleFilesAbsRefs/d.js"" type=""text/javascript""></script>
+<script src=""Debug/SampleFilesAbsRefs/c.js"" type=""text/javascript""></script>
+<script src=""/some/scriptg.js"" type=""text/javascript""></script>
+<script src=""Debug/SampleFilesAbsRefs/subdir/g.js"" type=""text/javascript""></script>
+<script src=""Debug/SampleFilesAbsRefs/b.js"" type=""text/javascript""></script>
+<script src=""/some/scripta.js"" type=""text/javascript""></script>
+<script src=""Debug/SampleFilesAbsRefs/a.js"" type=""text/javascript""></script>"
 

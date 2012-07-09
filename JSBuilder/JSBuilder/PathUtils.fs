@@ -38,8 +38,13 @@ let makePathRelativeTo absoluteRootPath absolutePath =
 /// to ones relative to the given absolute relative
 /// path.
 let makePathsRelativeTo absoluteRootPath (absolutePaths:seq<string>) = 
+    let inline isLiteralPath (path:string) =
+        not (path.StartsWith("!"))
     absolutePaths 
     |> Seq.map (fun absolutePath ->
-                    makePathRelativeTo absolutePath absoluteRootPath )
+                    if absolutePath |> isLiteralPath
+                    then makePathRelativeTo absolutePath absoluteRootPath
+                    else absolutePath.Trim([|'!'|]))
+                    
 
 
