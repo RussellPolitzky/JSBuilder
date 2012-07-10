@@ -3,6 +3,8 @@
 open Microsoft.VisualStudio.TestTools.UnitTesting    
 open System.Diagnostics
 open System
+open System.IO
+open System.Diagnostics
 
 /// Wrapper for Assert.AreEqual
 [<DebuggerStepThrough>]
@@ -53,4 +55,37 @@ let throwsException (typeOfException:Type) (codeBlock:unit->unit) =
                               (typeOfException.Name) (ex.GetType().Name))) 
                    () // returns unit
               else () // returns unit
+
+
+/// Opens a set of files in a diff viewer.
+let openDiff file1 file2 =
+    let startInfo = new ProcessStartInfo()
+    startInfo.FileName <- @"C:\Program Files\Perforce\p4merge.exe"
+    startInfo.Arguments <- sprintf "%s %s" file1 file2
+    Process.Start(startInfo);
+
+/// Predicate for matching strings.
+let stringsDiffer s1 s2 = 
+    not (s1 = s2)
+
+exception StringsDontMatch of string
+
+/// Uses a tester function to determine 
+/// if the given strings, s1 and s2 match.
+let _testStrings tester a b = 
+    if (tester a b)
+    then
+        let tempFiles = [| Path.GetTempFileName(); Path.GetTempFileName() |] 
+        Array.zip tempFiles [| a; b |] 
+        |> Array.iter (fun tpl -> File.WriteAllText((fst tpl), (snd tpl)))
+        openDiff tempFiles.[0] tempFiles.[1] |> ignore
+        raise (StringsDontMatch 
+                (sprintf "Expected <%s>, but actual is <%s>." a b))
+
+/// Tests the given strings for equality.
+/// If they're found to differ, then the 
+/// p4merge tools is opened to show the 
+/// difference.
+[<DebuggerStepThrough>]        
+let IsSameStringAs = _testStrings stringsDiffer
 

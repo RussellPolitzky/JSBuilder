@@ -4,6 +4,7 @@ open Microsoft.VisualStudio.TestTools.UnitTesting
 open References
 open StringUtils
 open Assertions
+open DiffLauncher
 open System.Collections.Generic
 open System.IO
 open System
@@ -182,3 +183,12 @@ Debug/ComplexDepsSampleFiles/a.js"
 <script src=""/some/scripta.js"" type=""text/javascript""></script>
 <script src=""Debug/SampleFilesAbsRefs/a.js"" type=""text/javascript""></script>"
 
+
+// Should be able to deal with css in a similar way to how we deal with JavaScript.
+// We would like to 
+
+
+    [<TestMethod>]        
+    member this.``should be able to show the diff between strings``() =
+       "this" |> IsSameStringAs "that" 
+       
