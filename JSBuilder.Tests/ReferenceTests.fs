@@ -18,7 +18,7 @@ type ``When finding references in JS files``() =
     member this.``should be able to find refs in js files``() =
         getReferencesInFile "JsTestFile.js"
         |> Seq.toSingleSringWithSep "\r\n"
-        |> Equals @"../../Me/testFile.js
+        |> IsSameStringAs @"../../Me/testFile.js
 Test/James.js
 Test/Joyce.js
 !http://some.web.site/hello.js
@@ -38,7 +38,7 @@ Test/Joyce.js
         getAllReferencedFiles @"SampleFiles\a.js"
         |> Seq.map (fun i -> Path.GetFileName(i)) 
         |> Seq.toSingleSringWithSep ","
-        |> Equals "a.js,b.js,g.js,h.js,c.js,d.js,f.js,e.js"
+        |> IsSameStringAs "a.js,b.js,g.js,h.js,c.js,d.js,f.js,e.js"
 
 
 
@@ -76,7 +76,7 @@ Test/Joyce.js
         _getReferencedScriptsInLoadOrder this.stubScriptLoader @"ComplexDepsSampleFiles\a.js"
         |> List.map (fun i -> Path.GetFileName(i).Replace(".js", "")) 
         |> Seq.toSingleSringWithSep ","
-        |> Equals "c,b,h,g,f,e,d,a"
+        |> IsSameStringAs "c,b,h,g,f,e,d,a"
 
 
     //
@@ -93,7 +93,7 @@ Test/Joyce.js
         getReferencedScriptsInLoadOrder @"ComplexDepsSampleFiles\a.js"
         |> List.map (fun i -> Path.GetFileName(i).Replace(".js", "")) 
         |> Seq.toSingleSringWithSep ","
-        |> Equals "f,h,e,d,c,g,b,a"
+        |> IsSameStringAs "f,h,e,d,c,g,b,a"
 
 
     //
@@ -121,7 +121,7 @@ Debug/ComplexDepsSampleFiles/a.js"
               .Replace(@"\" + pathToRootScript, String.Empty)
         getOrderedScriptPaths pathToRootScript absoluteAppRootPath
         |> Seq.toSingleSringWithSep "\r\n"
-        |> Equals expected
+        |> IsSameStringAs expected
 
 
     //
@@ -140,7 +140,7 @@ Debug/ComplexDepsSampleFiles/a.js"
             (Path.GetFullPath pathToRootScript)
               .Replace(@"\" + pathToRootScript, String.Empty)
         buildIncludesSectionFor pathToRootScript absoluteAppRootPath
-        |> Equals @"<script src=""Debug/ComplexDepsSampleFiles/f.js"" type=""text/javascript""></script>
+        |> IsSameStringAs @"<script src=""Debug/ComplexDepsSampleFiles/f.js"" type=""text/javascript""></script>
 <script src=""Debug/ComplexDepsSampleFiles/h.js"" type=""text/javascript""></script>
 <script src=""Debug/ComplexDepsSampleFiles/e.js"" type=""text/javascript""></script>
 <script src=""Debug/ComplexDepsSampleFiles/d.js"" type=""text/javascript""></script>
@@ -171,7 +171,7 @@ Debug/ComplexDepsSampleFiles/a.js"
             (Path.GetFullPath pathToRootScript)
               .Replace(@"\" + pathToRootScript, String.Empty)
         buildIncludesSectionFor pathToRootScript absoluteAppRootPath
-        |> Equals @"<script src=""Debug/SampleFilesAbsRefs/f.js"" type=""text/javascript""></script>
+        |> IsSameStringAs @"<script src=""Debug/SampleFilesAbsRefs/f.js"" type=""text/javascript""></script>
 <script src=""http://www.test.com/thisscript.js"" type=""text/javascript""></script>
 <script src=""Debug/SampleFilesAbsRefs/h.js"" type=""text/javascript""></script>
 <script src=""Debug/SampleFilesAbsRefs/e.js"" type=""text/javascript""></script>
@@ -188,7 +188,4 @@ Debug/ComplexDepsSampleFiles/a.js"
 // We would like to 
 
 
-    [<TestMethod>]        
-    member this.``should be able to show the diff between strings``() =
-       "this" |> IsSameStringAs "that" 
        
