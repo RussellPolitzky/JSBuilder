@@ -78,14 +78,29 @@ let _testStrings tester expected actual  =
         Environment.NewLine + "-------------------------" + 
         Environment.NewLine + 
         "This string has been copied to the clipboard." + Environment.NewLine + 
-        "To approve, simply paster into your test."
+        "To approve, simply paste it into your test."
+    
+    // Escape this to create a verabtim F# string that
+    // can be pasted directly into the test code.
+    let buildEscapedStringForClipboard (str:string) = 
+        let doubleQuotesEscaped = str.Replace(@"""", @"""""")
+        sprintf @"@""%s""" doubleQuotesEscaped
+
+    let copyToClipboard str = 
+        try 
+            System.Windows.Clipboard.SetData(
+                DataFormats.Text, 
+                buildEscapedStringForClipboard str);
+        with 
+            | ex -> () // swallow any COM exceptions here.
+
     if (tester expected actual)
     then
         let tempFiles = [| Path.GetTempFileName(); Path.GetTempFileName() |] 
         Array.zip tempFiles [| expected; actual + diffMessage |] 
         |> Array.iter (fun tpl -> File.WriteAllText((fst tpl), (snd tpl)))
         openDiff tempFiles.[0] tempFiles.[1] |> ignore
-        System.Windows.Clipboard.SetData(DataFormats.Text, actual);
+        copyToClipboard actual
         raise (StringsDontMatch 
                 (sprintf "Expected <%s>, but actual is <%s>." expected actual))
 
