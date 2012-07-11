@@ -5,6 +5,7 @@ open System.Diagnostics
 open System
 open System.IO
 open System.Diagnostics
+open System.Windows
 
 /// Wrapper for Assert.AreEqual
 [<DebuggerStepThrough>]
@@ -72,15 +73,21 @@ exception StringsDontMatch of string
 
 /// Uses a tester function to determine 
 /// if the given strings, s1 and s2 match.
-let _testStrings tester a b = 
-    if (tester a b)
+let _testStrings tester expected actual  = 
+    let diffMessage = 
+        Environment.NewLine + "-------------------------" + 
+        Environment.NewLine + 
+        "This string has been copied to the clipboard." + Environment.NewLine + 
+        "To approve, simply paster into your test."
+    if (tester expected actual)
     then
         let tempFiles = [| Path.GetTempFileName(); Path.GetTempFileName() |] 
-        Array.zip tempFiles [| a; b |] 
+        Array.zip tempFiles [| expected; actual + diffMessage |] 
         |> Array.iter (fun tpl -> File.WriteAllText((fst tpl), (snd tpl)))
         openDiff tempFiles.[0] tempFiles.[1] |> ignore
+        System.Windows.Clipboard.SetData(DataFormats.Text, actual);
         raise (StringsDontMatch 
-                (sprintf "Expected <%s>, but actual is <%s>." a b))
+                (sprintf "Expected <%s>, but actual is <%s>." expected actual))
 
 /// Tests the given strings for equality.
 /// If they're found to differ, then the 

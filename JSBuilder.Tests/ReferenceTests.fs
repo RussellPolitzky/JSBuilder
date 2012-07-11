@@ -76,9 +76,9 @@ Test/Joyce.js
         _getReferencedScriptsInLoadOrder this.stubScriptLoader @"ComplexDepsSampleFiles\a.js"
         |> List.map (fun i -> Path.GetFileName(i).Replace(".js", "")) 
         |> Seq.toSingleSringWithSep ","
-        |> IsSameStringAs "c,b,h,g,f,e,d,a"
+        |> IsSameStringAs "c,b,h,g,f,e,d,a_"
 
-
+        
     //
     //        a
     //       / \
