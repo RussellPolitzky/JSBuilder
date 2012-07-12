@@ -35,7 +35,7 @@ Test/Joyce.js
     //
     [<TestMethod>]        
     member this.``should be able to get full list of refs from tree``() =
-        getAllReferencedFiles @"SampleFiles\a.js"
+        fst (getAllReferencedFiles @"SampleFiles\a.js")
         |> Seq.map (fun i -> Path.GetFileName(i)) 
         |> Seq.toSingleSringWithSep ","
         |> IsSameStringAs "a.js,b.js,g.js,h.js,c.js,d.js,f.js,e.js"
@@ -57,7 +57,7 @@ Test/Joyce.js
         // then pipe it ot the throwsException function.
         // The lambda takes not args (unit) and returns nothing
         // (unit)
-        (fun () -> getAllReferencedFiles @"SampleFilesCircularRef\a.js"
+        (fun () -> fst (getAllReferencedFiles @"SampleFilesCircularRef\a.js")
                    |> Seq.map (fun i -> Path.GetFileName(i)) 
                    |> Seq.toSingleSringWithSep ","
                    |> Equals "a.js,c.js,e.js,d.js,f.js,b.js,g.js,h.js")
@@ -66,17 +66,18 @@ Test/Joyce.js
 
     // Stub script loader function for testing purposes.
     member this.stubScriptLoader = 
-        (fun rootScript -> (["a";"b";"c";"d";"e";"f";"g";"h";"b";"c"] 
-                           |> Seq.ofList).ToList())
+        (fun rootScript -> 
+            ((["a";"b";"c";"d";"e";"f";"g";"h";"b";"c"] |> Seq.ofList).ToList(),
+             ([] |> Seq.ofList).ToList()))
 
     // Given a list of scripts, the we should get back a list 
     // in reverse order where only the first instance is mentioed.
     [<TestMethod>]        
     member this.``should get list of scripts in reverse order with only one occurrence``() =
-        _getReferencedScriptsInLoadOrder this.stubScriptLoader @"ComplexDepsSampleFiles\a.js"
+        fst (_getReferencedScriptsInLoadOrder this.stubScriptLoader @"ComplexDepsSampleFiles\a.js")
         |> List.map (fun i -> Path.GetFileName(i).Replace(".js", "")) 
         |> Seq.toSingleSringWithSep ","
-        |> IsSameStringAs "c,b,h,g,f,e,d,a_"
+        |> IsSameStringAs @"c,b,h,g,f,e,d,a"
 
         
     //
@@ -90,7 +91,7 @@ Test/Joyce.js
     //
     [<TestMethod>]        
     member this.``should be able to get scripts in required load order``() =
-        getReferencedScriptsInLoadOrder @"ComplexDepsSampleFiles\a.js"
+        fst (getReferencedScriptsInLoadOrder @"ComplexDepsSampleFiles\a.js")
         |> List.map (fun i -> Path.GetFileName(i).Replace(".js", "")) 
         |> Seq.toSingleSringWithSep ","
         |> IsSameStringAs "f,h,e,d,c,g,b,a"
@@ -119,7 +120,7 @@ Debug/ComplexDepsSampleFiles/a.js"
         let absoluteAppRootPath = 
             (Path.GetFullPath pathToRootScript)
               .Replace(@"\" + pathToRootScript, String.Empty)
-        getOrderedScriptPaths pathToRootScript absoluteAppRootPath
+        fst (getOrderedScriptPaths pathToRootScript absoluteAppRootPath)
         |> Seq.toSingleSringWithSep "\r\n"
         |> IsSameStringAs expected
 
@@ -185,7 +186,8 @@ Debug/ComplexDepsSampleFiles/a.js"
 
 
 // Should be able to deal with css in a similar way to how we deal with JavaScript.
-// We would like to 
+// 
+// Find all css refs in the 
 
 
        
