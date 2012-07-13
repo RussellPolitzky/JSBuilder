@@ -34,8 +34,8 @@ let makePathRelativeTo absoluteRootPath absolutePath =
         .ToString();
 
 
-/// Transforms a sequence of absolute paths from
-/// to ones relative to the given absolute relative
+/// Transforms a sequence of absolute paths 
+/// to ones relative to the given, absolute relative
 /// path.
 let makePathsRelativeTo absoluteRootPath (absolutePaths:seq<string>) = 
     let inline isLiteralPath (path:string) =

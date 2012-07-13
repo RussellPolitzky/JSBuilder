@@ -15,7 +15,7 @@ let extractFromLinesInFile (refRegex:Regex) (groupName:string) fileName =
     |> Array.map (fun l -> let mtch = refRegex.Match(l)
                            (mtch.Success, mtch.Groups.[groupName].Value))
     |> Array.filter(fun tpl -> fst tpl)
-    |> Array.map(fun tpl -> snd tpl) 
+    |> Array.map   (fun tpl -> snd tpl) 
 
 
 /// Regex to find the references in JavaScript files.
@@ -39,8 +39,8 @@ let _getAllReferencedFiles (refFinder:string -> string[]) rootFile =
 
     let inline isAnAbsoluteJsPath  (path:string) = path.StartsWith("!") && path.ToLower().EndsWith(".js")
     let inline isAnAbsoluteCssPath (path:string) = path.StartsWith("!") && path.ToLower().EndsWith(".css")
-    let inline isARelativeJsPath  (path:string) = (not (path.StartsWith("!"))) && path.ToLower().EndsWith(".js")
-    let inline isARelativeCssPath (path:string) = (not (path.StartsWith("!"))) && path.ToLower().EndsWith(".css")
+    let inline isARelativeJsPath   (path:string) = (not (path.StartsWith("!"))) && path.ToLower().EndsWith(".js")
+    let inline isARelativeCssPath  (path:string) = (not (path.StartsWith("!"))) && path.ToLower().EndsWith(".css")
 
     let testForCircularReference pathStack = 
         if pathStack |> Seq.hasDuplicates
@@ -113,7 +113,6 @@ let _getReferencedScriptsInLoadOrder (refFileLoader:string -> (List<string> * Li
         |> List.filter (fun script -> script |> notAlreadyInList)
     
     let (jsFiles, cssFiles) = refFileLoader pathToRootScript
-
     (jsFiles  |> orderFilesAndRemoveDuplicates,
      cssFiles |> orderFilesAndRemoveDuplicates)
     
@@ -143,6 +142,7 @@ let convertPathToJsRefFormat (path:string) =
     sprintf 
         @"<script src=""%s"" type=""text/javascript""></script>" 
         path
+
 
 /// Converts the given path string to the 
 /// format <link href="path_to_css" type=""text/css""></script>
