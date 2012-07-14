@@ -27,8 +27,6 @@ let SameAs (a:'a) (b:'a) =
 let NotSameAs (a:'a) (b:'a) = 
     Assert.AreNotSame(a,b)
 
-/// Exception to be used with throwsException
-exception ExceptionNotThrown of string
 
 /// Ensures that the expected exception is thrown.
 /// Allows the following syntax:
@@ -46,14 +44,12 @@ exception ExceptionNotThrown of string
 let throwsException (typeOfException:Type) (codeBlock:unit->unit) = 
     try
       codeBlock() // Execute the lambda function.
-      raise (ExceptionNotThrown 
-              (sprintf "Expected exception of type %s to be thrown" 
-                 (typeOfException.Name)))
+      failwith (sprintf "Expected exception of type %s to be thrown" 
+                 (typeOfException.Name))
     with
       | ex -> if (ex.GetType() <> typeOfException)
-              then raise (ExceptionNotThrown 
-                           (sprintf "Expected exception of type %s to be thrown but received one of type %s instead." 
-                              (typeOfException.Name) (ex.GetType().Name))) 
+              then failwith (sprintf "Expected exception of type %s to be thrown but received one of type %s instead." 
+                              (typeOfException.Name) (ex.GetType().Name)) 
                    () // returns unit
               else () // returns unit
 
@@ -65,15 +61,21 @@ let openDiff file1 file2 =
     startInfo.Arguments <- sprintf "%s %s" file1 file2
     Process.Start(startInfo);
 
+/// Useable tempfile (see: http://fssnip.net/4N/)
+type TempFile() =
+     let path = System.IO.Path.GetTempFileName()
+     member x.Path = path
+     interface System.IDisposable with
+         member x.Dispose() = System.IO.File.Delete(path)
+
 /// Predicate for matching strings.
 let stringsDiffer s1 s2 = 
     not (s1 = s2)
 
-exception StringsDontMatch of string
-
 /// Uses a tester function to determine 
 /// if the given strings, s1 and s2 match.
-let _testStrings tester expected actual  = 
+let testStrings' testFails expected actual  = 
+
     let diffMessage = 
         Environment.NewLine + "-------------------------" + 
         Environment.NewLine + 
@@ -81,7 +83,7 @@ let _testStrings tester expected actual  =
         "To approve, simply paste it into your test."
     
     // Escape this to create a verabtim F# string that
-    // can be pasted directly into the test code.
+    // may be pasted directly into the test code.
     let buildEscapedStringForClipboard (str:string) = 
         let doubleQuotesEscaped = str.Replace(@"""", @"""""")
         sprintf @"@""%s""" doubleQuotesEscaped
@@ -92,22 +94,36 @@ let _testStrings tester expected actual  =
                 DataFormats.Text, 
                 buildEscapedStringForClipboard str);
         with 
-            | ex -> () // swallow any COM exceptions here.
+            | ex -> () // swallow any COM exceptions here. ... 
 
-    if (tester expected actual)
-    then
-        let tempFiles = [| Path.GetTempFileName(); Path.GetTempFileName() |] 
-        Array.zip tempFiles [| expected; actual + diffMessage |] 
-        |> Array.iter (fun tpl -> File.WriteAllText((fst tpl), (snd tpl)))
-        openDiff tempFiles.[0] tempFiles.[1] |> ignore
-        copyToClipboard actual
-        raise (StringsDontMatch 
-                (sprintf "Expected <%s>, but actual is <%s>." expected actual))
+    // True if a debugger is attached to the 
+    // process running the tests.
+    let debuggerIsAttached =                 
+        System.Diagnostics.Debugger.IsAttached
+
+    if not debuggerIsAttached then
+        Assert.AreEqual(expected, actual) // Assume running on CI server.
+    else
+        if testFails expected actual
+        then // Show any change in diff viewer and copy received to clipboard.
+            use tempFileExpected = new TempFile()
+            use tempFileActual   = new TempFile()
+            let tempFiles = [| tempFileExpected.Path; tempFileActual.Path |] 
+            [| expected; actual + diffMessage |] 
+            |> Array.zip tempFiles 
+            |> Array.iter (fun tpl -> File.WriteAllText((fst tpl), (snd tpl)))
+            openDiff tempFileExpected.Path tempFileActual.Path |> ignore
+            actual |> copyToClipboard
+            failwith (sprintf "Expected <%s>, but actual is <%s>." expected actual)
 
 /// Tests the given strings for equality.
 /// If they're found to differ, then the 
 /// p4merge tools is opened to show the 
-/// difference.
+/// differences.  The received string is 
+/// escaped and sent to the clipboard 
+/// so that it may be easily copied to the 
+/// relvant test to accept the changes if 
+/// they're expected.
 [<DebuggerStepThrough>]        
-let IsSameStringAs = _testStrings stringsDiffer
+let IsSameStringAs = testStrings' stringsDiffer
 

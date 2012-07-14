@@ -172,7 +172,10 @@ Debug/ComplexDepsSampleFiles/a.js"
             (Path.GetFullPath pathToRootScript)
               .Replace(@"\" + pathToRootScript, String.Empty)
         buildIncludesSectionFor pathToRootScript absoluteAppRootPath
-        |> IsSameStringAs @"<script src=""Debug/SampleFilesAbsRefs/f.js"" type=""text/javascript""></script>
+        |> IsSameStringAs @"<link href=""Debug/Styles/h.css"" rel=""stylesheet"" type=""text/css"" />
+<link href=""Debug/Styles/a.css"" rel=""stylesheet"" type=""text/css"" />
+<link href=""Debug/Styles/b.css"" rel=""stylesheet"" type=""text/css"" />
+<link href=""Styles/c.css"" rel=""stylesheet"" type=""text/css"" /><script src=""Debug/SampleFilesAbsRefs/f.js"" type=""text/javascript""></script>
 <script src=""http://www.test.com/thisscript.js"" type=""text/javascript""></script>
 <script src=""Debug/SampleFilesAbsRefs/h.js"" type=""text/javascript""></script>
 <script src=""Debug/SampleFilesAbsRefs/e.js"" type=""text/javascript""></script>
