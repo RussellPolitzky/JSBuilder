@@ -67,15 +67,14 @@ Test/Joyce.js
     // Stub script loader function for testing purposes.
     member this.stubScriptLoader = 
         (fun rootScript -> 
-            ((["a";"b";"c";"d";"e";"f";"g";"h";"b";"c"] |> Seq.ofList).ToList(),
-             ([] |> Seq.ofList).ToList()))
+            (["a";"b";"c";"d";"e";"f";"g";"h";"b";"c"], []))
 
     // Given a list of scripts, the we should get back a list 
     // in reverse order where only the first instance is mentioed.
     [<TestMethod>]        
     member this.``should get list of scripts in reverse order with only one occurrence``() =
         fst (_getReferencedScriptsInLoadOrder this.stubScriptLoader @"ComplexDepsSampleFiles\a.js")
-        |> List.map (fun i -> Path.GetFileName(i).Replace(".js", "")) 
+        |> Seq.map (fun i -> Path.GetFileName(i).Replace(".js", "")) 
         |> Seq.toSingleSringWithSep ","
         |> IsSameStringAs @"c,b,h,g,f,e,d,a"
 
@@ -92,7 +91,7 @@ Test/Joyce.js
     [<TestMethod>]        
     member this.``should be able to get scripts in required load order``() =
         fst (getReferencedScriptsInLoadOrder @"ComplexDepsSampleFiles\a.js")
-        |> List.map (fun i -> Path.GetFileName(i).Replace(".js", "")) 
+        |> Seq.map (fun i -> Path.GetFileName(i).Replace(".js", "")) 
         |> Seq.toSingleSringWithSep ","
         |> IsSameStringAs "f,h,e,d,c,g,b,a"
 

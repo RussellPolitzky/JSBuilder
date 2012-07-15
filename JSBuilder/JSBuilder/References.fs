@@ -4,7 +4,7 @@ module References
 open System
 open System.IO
 open System.Text.RegularExpressions
-open System.Collections.Generic
+//open System.Collections.Generic
 open System.Linq
 open PathUtils
 
@@ -49,8 +49,6 @@ let _getAllReferencedFiles (refFinder:string -> string[]) rootFile =
             let message = sprintf "Circular reference found: %s" pathWithCircRef
             raise (new Exception(message))
 
-// let sumArray array = Array.fold (fun acc elem -> acc + elem) 0 array
-
     let rec _getAllReferencedFiles 
             jsFilesList
             cssFilesList 
@@ -80,22 +78,17 @@ let _getAllReferencedFiles (refFinder:string -> string[]) rootFile =
                                  let fullPath = calculatePath rootpth pth
                                  let nameAndDir = getNameAndDirectory fullPath
                                  _getAllReferencedFiles 
-                                    (fullPath::(fst acc)) 
+                                    (fullPath::(fst acc))
                                     (snd acc) 
                                     newPathList 
                                     nameAndDir.Directory 
                                     nameAndDir.Name) 
-                      (jsFilesList, [])
-        //(jsList, cssFilesList)
-                                  
+                      (jsFilesList, cssFilesList)
     
-    let nameAndDir   = getNameAndDirectory rootFile
-    let jsFilesList  = [ calculatePath nameAndDir.Directory nameAndDir.Name ]
-    //let cssFilesList = []
-    let pathList     = []
-    //_getAllReferencedFiles jsFilesList cssFilesList pathList nameAndDir.Directory nameAndDir.Name 
-    _getAllReferencedFiles jsFilesList pathList nameAndDir.Directory nameAndDir.Name 
-    
+    let nameAndDir  = getNameAndDirectory rootFile
+    let jsFilesList = [ calculatePath nameAndDir.Directory nameAndDir.Name ]
+    _getAllReferencedFiles jsFilesList [] [] nameAndDir.Directory nameAndDir.Name 
+
 
 /// Gets a list of all referenced files
 /// from the given root.  Note the partial 
@@ -110,20 +103,27 @@ let getAllReferencedFiles pathToRootScript =
 /// This version is not intended to be used 
 /// directly and it allows injection of a
 /// reference file loader function for testing.
-let _getReferencedScriptsInLoadOrder (refFileLoader:string -> (List<string> * List<string>)) pathToRootScript = 
+let _getReferencedScriptsInLoadOrder 
+    (refFileLoader:string->(List<string> * List<string>) )
+    (pathToRootScript:string) = 
+
+    // Removes duplicates preserving 
+    // the first occurrence.
+    let removeDuplicates allFiles = 
+        allFiles 
+        |> Seq.distinct
+        |> List.ofSeq
 
     // Reverse the list and return 
     // only the first occurrence.
     let orderFilesAndRemoveDuplicates allFiles = 
-        let setOfFiles = new HashSet<string>()
-        let notAlreadyInList script = setOfFiles.Add(script) // want the boolean result from this.
         allFiles
-        |> List.ofSeq 
+        |> removeDuplicates        
+        |> List.ofSeq        
         |> List.rev
-        |> List.filter (fun script -> script |> notAlreadyInList)
     
     let (jsFiles, cssFiles) = refFileLoader pathToRootScript
-    (jsFiles  |> orderFilesAndRemoveDuplicates,
+    (jsFiles  |> removeDuplicates,
      cssFiles |> orderFilesAndRemoveDuplicates)
     
 
@@ -133,7 +133,7 @@ let _getReferencedScriptsInLoadOrder (refFileLoader:string -> (List<string> * Li
 /// by the references in each file.
 let getReferencedScriptsInLoadOrder pathToRootScript = 
     _getReferencedScriptsInLoadOrder getAllReferencedFiles pathToRootScript
-
+    
 
 /// Gets a list of all required includes in 
 /// the correct order and makes their paths 
@@ -176,8 +176,8 @@ let _buildIncludesSectionFor
     pathToRootScript 
     absolutePathToAppDirectory =
     let (jsFiles, cssFiles) = getOrderedScriptPaths pathToRootScript absolutePathToAppDirectory
-    (jsFiles |> Seq.map (fun path -> path |> wrapForJsFile),
-      cssFiles |> Seq.map (fun path -> path |> wrapForCssFile))
+    (jsFiles  |> Seq.map (fun path -> path |> wrapForJsFile),
+     cssFiles |> Seq.map (fun path -> path |> wrapForCssFile))
 
 
 /// Builds the includes section for the JavaScript scripts
@@ -191,4 +191,5 @@ let buildIncludesSectionFor pathToRootScript absolutePathToAppDirectory =
           pathToRootScript
           absolutePathToAppDirectory
     (cssSection |> Seq.toSingleSringWithSep Environment.NewLine)
+    + Environment.NewLine
     + (jsSection |> Seq.toSingleSringWithSep Environment.NewLine)
