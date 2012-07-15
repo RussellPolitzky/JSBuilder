@@ -31,6 +31,8 @@ let getReferencesInFile =
 
 exception UnsupportedReferenceType of string
 
+type Accumulator = { js : List<string>; css: List<string> }
+
 /// Gets a list of the full paths to all referenced
 /// files by walking the dependency tree defined by
 /// the references found in each file.  The user 
@@ -61,15 +63,15 @@ let _getAllReferencedFiles (refFinder:string -> string[]) rootFile =
         absPath
         |> refFinder 
         |> Array.rev // Ensure that the refs in a given file appear in the final list in the order given
-        |> Array.fold (fun acc relPathToDep -> 
+        |> Array.fold (fun (acc:Accumulator) relPathToDep -> 
                            match relPathToDep with
                            | pth when pth |> isAnAbsoluteJsPath  -> 
-                                (pth::(fst acc), (snd acc))
+                                {js=(pth::acc.js); css=acc.css}
                            | pth when pth |> isAnAbsoluteCssPath -> 
-                                ((fst acc), pth::(snd acc))
+                                {js=(pth::acc.js); css=(pth::acc.css)}
                            | pth when pth |> isARelativeCssPath  -> 
                                 let absCssPath = calculatePath rootpth pth
-                                ((fst acc), absCssPath::(snd acc))
+                                {js=acc.js; css=(absCssPath::acc.css)}
                            | pth -> // Had to do this, to ensure that 
                                     // the recursive call is the last option in the match.
                                  if (pth |> (isARelativeJsPath >> not))
@@ -78,12 +80,12 @@ let _getAllReferencedFiles (refFinder:string -> string[]) rootFile =
                                  let fullPath = calculatePath rootpth pth
                                  let nameAndDir = getNameAndDirectory fullPath
                                  _getAllReferencedFiles 
-                                    (fullPath::(fst acc))
-                                    (snd acc) 
+                                    (fullPath::acc.js) 
+                                    acc.css 
                                     newPathList 
                                     nameAndDir.Directory 
                                     nameAndDir.Name) 
-                      (jsFilesList, cssFilesList)
+                      { js=jsFilesList ; css=cssFilesList } // Seed
     
     let nameAndDir  = getNameAndDirectory rootFile
     let jsFilesList = [ calculatePath nameAndDir.Directory nameAndDir.Name ]
@@ -94,7 +96,9 @@ let _getAllReferencedFiles (refFinder:string -> string[]) rootFile =
 /// from the given root.  Note the partial 
 /// application and the DI again here.
 let getAllReferencedFiles pathToRootScript = 
-    _getAllReferencedFiles getReferencesInFile pathToRootScript
+    let filesAccumulator = _getAllReferencedFiles getReferencesInFile pathToRootScript
+    filesAccumulator.js, filesAccumulator.css
+
 
 /// Finds the unique set of scrips in the 
 /// required load order from the set of 
@@ -190,6 +194,9 @@ let buildIncludesSectionFor pathToRootScript absolutePathToAppDirectory =
           convertPathToCssRefFormat // injected converter function
           pathToRootScript
           absolutePathToAppDirectory
-    (cssSection |> Seq.toSingleSringWithSep Environment.NewLine)
-    + Environment.NewLine
-    + (jsSection |> Seq.toSingleSringWithSep Environment.NewLine)
+    let cssIncludes = (cssSection |> Seq.toSingleSringWithSep Environment.NewLine)
+    let jsIncludes = (jsSection |> Seq.toSingleSringWithSep Environment.NewLine)
+    if (cssIncludes = "") 
+    then jsIncludes
+    else cssIncludes + Environment.NewLine + jsIncludes
+    

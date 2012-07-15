@@ -38,8 +38,7 @@ Test/Joyce.js
         fst (getAllReferencedFiles @"SampleFiles\a.js")
         |> Seq.map (fun i -> Path.GetFileName(i)) 
         |> Seq.toSingleSringWithSep ","
-        |> IsSameStringAs "a.js,b.js,g.js,h.js,c.js,d.js,f.js,e.js"
-
+        |> IsSameStringAs @"e.js,f.js,d.js,c.js,h.js,g.js,b.js,a.js"
 
 
     //
@@ -69,15 +68,25 @@ Test/Joyce.js
         (fun rootScript -> 
             (["a";"b";"c";"d";"e";"f";"g";"h";"b";"c"], []))
 
+
+    // ComplexDepsSampleFiles               
+    //        a
+    //       / \
+    //      c   b______
+    //     / \   \     |
+    //   d    \___e    g
+    //  /        / \  /
+    // f________/   h
+    //
     // Given a list of scripts, the we should get back a list 
     // in reverse order where only the first instance is mentioed.
     [<TestMethod>]        
-    member this.``should get list of scripts in reverse order with only one occurrence``() =
+    member this.``should get list of scripts in order with only one occurrence of each``() =
         fst (_getReferencedScriptsInLoadOrder this.stubScriptLoader @"ComplexDepsSampleFiles\a.js")
         |> Seq.map (fun i -> Path.GetFileName(i).Replace(".js", "")) 
         |> Seq.toSingleSringWithSep ","
-        |> IsSameStringAs @"c,b,h,g,f,e,d,a"
-
+        |> IsSameStringAs @"a,b,c,d,e,f,g,h"
+                           
         
     //
     //        a
@@ -171,10 +180,11 @@ Debug/ComplexDepsSampleFiles/a.js"
             (Path.GetFullPath pathToRootScript)
               .Replace(@"\" + pathToRootScript, String.Empty)
         buildIncludesSectionFor pathToRootScript absoluteAppRootPath
-        |> IsSameStringAs @"<link href=""Debug/Styles/h.css"" rel=""stylesheet"" type=""text/css"" />
-<link href=""Debug/Styles/a.css"" rel=""stylesheet"" type=""text/css"" />
+        |> IsSameStringAs @"<link href=""Styles/c.css"" rel=""stylesheet"" type=""text/css"" />
 <link href=""Debug/Styles/b.css"" rel=""stylesheet"" type=""text/css"" />
-<link href=""Styles/c.css"" rel=""stylesheet"" type=""text/css"" /><script src=""Debug/SampleFilesAbsRefs/f.js"" type=""text/javascript""></script>
+<link href=""Debug/Styles/a.css"" rel=""stylesheet"" type=""text/css"" />
+<link href=""Debug/Styles/h.css"" rel=""stylesheet"" type=""text/css"" />
+<script src=""Debug/SampleFilesAbsRefs/f.js"" type=""text/javascript""></script>
 <script src=""http://www.test.com/thisscript.js"" type=""text/javascript""></script>
 <script src=""Debug/SampleFilesAbsRefs/h.js"" type=""text/javascript""></script>
 <script src=""Debug/SampleFilesAbsRefs/e.js"" type=""text/javascript""></script>
@@ -184,6 +194,7 @@ Debug/ComplexDepsSampleFiles/a.js"
 <script src=""Debug/SampleFilesAbsRefs/subdir/g.js"" type=""text/javascript""></script>
 <script src=""Debug/SampleFilesAbsRefs/b.js"" type=""text/javascript""></script>
 <script src=""/some/scripta.js"" type=""text/javascript""></script>
+<script src=""Styles/c.css"" type=""text/javascript""></script>
 <script src=""Debug/SampleFilesAbsRefs/a.js"" type=""text/javascript""></script>"
 
 
