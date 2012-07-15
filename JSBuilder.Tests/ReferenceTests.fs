@@ -166,7 +166,7 @@ Debug/ComplexDepsSampleFiles/a.js"
     // by a leading "!".  An example reference is as follows:
     // /// <reference path="!/some/script.js" />
     [<TestMethod>]        
-    member this.``should be able to deal with absolute http refs in js files``() =
+    member this.``should be able to deal with absolute http refs in js files and css``() =
         let pathToRootScript = @"SampleFilesAbsRefs\a.js" 
         let absoluteAppRootPath = 
             (Path.GetFullPath pathToRootScript)

@@ -49,43 +49,53 @@ let _getAllReferencedFiles (refFinder:string -> string[]) rootFile =
             let message = sprintf "Circular reference found: %s" pathWithCircRef
             raise (new Exception(message))
 
+// let sumArray array = Array.fold (fun acc elem -> acc + elem) 0 array
+
     let rec _getAllReferencedFiles 
-            (jsfiles:List<string>) 
-            (cssfiles:List<string>) 
-            (pathStack:Stack<string>) 
+            jsFilesList
+            cssFilesList 
+            pathlist
             rootpth 
             rootfle =
         let absPath = calculatePath rootpth rootfle 
-        pathStack.Push(absPath)
-        testForCircularReference pathStack
+        let newPathList = absPath::pathlist
+        testForCircularReference newPathList
         absPath
         |> refFinder 
         |> Array.rev // Ensure that the refs in a given file appear in the final list in the order given
-        |> Array.iter (fun relPathToDep -> 
+        |> Array.fold (fun acc relPathToDep -> 
                            match relPathToDep with
-                           | pth when pth |> isAnAbsoluteJsPath  -> jsfiles.Add(pth) 
-                           | pth when pth |> isAnAbsoluteCssPath -> cssfiles.Add(pth)
-                           | pth when pth |> isARelativeCssPath  -> cssfiles.Add(calculatePath rootpth pth)
+                           | pth when pth |> isAnAbsoluteJsPath  -> 
+                                (pth::(fst acc), (snd acc))
+                           | pth when pth |> isAnAbsoluteCssPath -> 
+                                ((fst acc), pth::(snd acc))
+                           | pth when pth |> isARelativeCssPath  -> 
+                                let absCssPath = calculatePath rootpth pth
+                                ((fst acc), absCssPath::(snd acc))
                            | pth -> // Had to do this, to ensure that 
                                     // the recursive call is the last option in the match.
-                                 if (not (pth |> isARelativeJsPath))
+                                 if (pth |> (isARelativeJsPath >> not))
                                  then raise (UnsupportedReferenceType(sprintf "Reference of type %s is unsupported." pth)) 
 
                                  let fullPath = calculatePath rootpth pth
-                                 jsfiles.Add(fullPath)
                                  let nameAndDir = getNameAndDirectory fullPath
-                                 _getAllReferencedFiles jsfiles cssfiles pathStack nameAndDir.Directory nameAndDir.Name)
-
-        pathStack.Pop() |> ignore // Not sure how to turn this into tail recursion - how can I use a continuation here?
+                                 _getAllReferencedFiles 
+                                    (fullPath::(fst acc)) 
+                                    (snd acc) 
+                                    newPathList 
+                                    nameAndDir.Directory 
+                                    nameAndDir.Name) 
+                      (jsFilesList, [])
+        //(jsList, cssFilesList)
                                   
-    let allJsFiles  = new List<string>() 
-    let allCssFiles = new List<string>() 
-    let pathStack   = new Stack<string>()
-    let nameAndDir  = getNameAndDirectory rootFile
-    allJsFiles.Add(calculatePath nameAndDir.Directory nameAndDir.Name);
-    _getAllReferencedFiles allJsFiles allCssFiles pathStack nameAndDir.Directory nameAndDir.Name 
-    (allJsFiles, allCssFiles)
-
+    
+    let nameAndDir   = getNameAndDirectory rootFile
+    let jsFilesList  = [ calculatePath nameAndDir.Directory nameAndDir.Name ]
+    //let cssFilesList = []
+    let pathList     = []
+    //_getAllReferencedFiles jsFilesList cssFilesList pathList nameAndDir.Directory nameAndDir.Name 
+    _getAllReferencedFiles jsFilesList pathList nameAndDir.Directory nameAndDir.Name 
+    
 
 /// Gets a list of all referenced files
 /// from the given root.  Note the partial 
