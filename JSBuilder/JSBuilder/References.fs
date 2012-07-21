@@ -4,7 +4,6 @@ module References
 open System
 open System.IO
 open System.Text.RegularExpressions
-//open System.Collections.Generic
 open System.Linq
 open PathUtils
 
@@ -31,18 +30,19 @@ let getReferencesInFile =
 
 exception UnsupportedReferenceType of string
 
-type Accumulator = { js : List<string>; css: List<string> }
+/// Type to act as accumulator for fold 
+/// function below.
+type private Accumulator = { js : List<string>; css: List<string> }
+
 
 /// Gets a list of the full paths to all referenced
 /// files by walking the dependency tree defined by
 /// the references found in each file.  The user 
 /// specifies the root script. 
-let _getAllReferencedFiles (refFinder:string -> string[]) rootFile = 
+let private _getAllReferencedFiles (refFinder:string -> string[]) rootFile = 
 
-    let inline isAnAbsoluteJsPath  (path:string) = path.StartsWith("!") && path.ToLower().EndsWith(".js")
-    let inline isAnAbsoluteCssPath (path:string) = path.StartsWith("!") && path.ToLower().EndsWith(".css")
-    let inline isARelativeJsPath   (path:string) = (not (path.StartsWith("!"))) && path.ToLower().EndsWith(".js")
-    let inline isARelativeCssPath  (path:string) = (not (path.StartsWith("!"))) && path.ToLower().EndsWith(".css")
+    let (|ABSOLUTE|RELATIVE|) (path:string) = if path.StartsWith("!") then ABSOLUTE(path) else RELATIVE(path)
+    let (|CSS|JS|) (path:string) = if path.ToLower().EndsWith(".css") then CSS(path) else JS(path)
 
     let testForCircularReference pathStack = 
         if pathStack |> Seq.hasDuplicates
@@ -51,12 +51,7 @@ let _getAllReferencedFiles (refFinder:string -> string[]) rootFile =
             let message = sprintf "Circular reference found: %s" pathWithCircRef
             raise (new Exception(message))
 
-    let rec _getAllReferencedFiles 
-            jsFilesList
-            cssFilesList 
-            pathlist
-            rootpth 
-            rootfle =
+    let rec _getAllReferencedFiles jsFilesList cssFilesList pathlist rootpth rootfle =
         let absPath = calculatePath rootpth rootfle 
         let newPathList = absPath::pathlist
         testForCircularReference newPathList
@@ -65,27 +60,16 @@ let _getAllReferencedFiles (refFinder:string -> string[]) rootFile =
         |> Array.rev // Ensure that the refs in a given file appear in the final list in the order given
         |> Array.fold (fun (acc:Accumulator) relPathToDep -> 
                            match relPathToDep with
-                           | pth when pth |> isAnAbsoluteJsPath  -> 
-                                {js=(pth::acc.js); css=acc.css}
-                           | pth when pth |> isAnAbsoluteCssPath -> 
-                                {js=(pth::acc.js); css=(pth::acc.css)}
-                           | pth when pth |> isARelativeCssPath  -> 
-                                let absCssPath = calculatePath rootpth pth
-                                {js=acc.js; css=(absCssPath::acc.css)}
-                           | pth -> // Had to do this, to ensure that 
-                                    // the recursive call is the last option in the match.
-                                 if (pth |> (isARelativeJsPath >> not))
-                                 then raise (UnsupportedReferenceType(sprintf "Reference of type %s is unsupported." pth)) 
-
-                                 let fullPath = calculatePath rootpth pth
-                                 let nameAndDir = getNameAndDirectory fullPath
-                                 _getAllReferencedFiles 
-                                    (fullPath::acc.js) 
-                                    acc.css 
-                                    newPathList 
-                                    nameAndDir.Directory 
-                                    nameAndDir.Name) 
-                      { js=jsFilesList ; css=cssFilesList } // Seed
+                           | CSS(pth) ->  match pth with 
+                                             | RELATIVE(path) -> let absCssPath = calculatePath rootpth pth
+                                                                 {js=acc.js; css=(absCssPath::acc.css)}
+                                             | ABSOLUTE(path) -> {js=acc.js; css=(       pth::acc.css)}
+                           | JS(pth) ->  match pth with
+                                             | ABSOLUTE(path)  -> {js=(pth::acc.js); css=acc.css}
+                                             | RELATIVE(path)  -> let fullPath   = calculatePath rootpth pth
+                                                                  let nameAndDir = getNameAndDirectory fullPath
+                                                                  _getAllReferencedFiles (fullPath::acc.js) acc.css newPathList nameAndDir.Directory nameAndDir.Name) 
+                      { js=jsFilesList ; css=cssFilesList } // fold seed
     
     let nameAndDir  = getNameAndDirectory rootFile
     let jsFilesList = [ calculatePath nameAndDir.Directory nameAndDir.Name ]

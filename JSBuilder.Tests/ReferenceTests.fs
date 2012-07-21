@@ -194,7 +194,6 @@ Debug/ComplexDepsSampleFiles/a.js"
 <script src=""Debug/SampleFilesAbsRefs/subdir/g.js"" type=""text/javascript""></script>
 <script src=""Debug/SampleFilesAbsRefs/b.js"" type=""text/javascript""></script>
 <script src=""/some/scripta.js"" type=""text/javascript""></script>
-<script src=""Styles/c.css"" type=""text/javascript""></script>
 <script src=""Debug/SampleFilesAbsRefs/a.js"" type=""text/javascript""></script>"
 
 
