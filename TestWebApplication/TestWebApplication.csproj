@@ -74,6 +74,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Scripts\" />
     <Folder Include="Templates\" />
   </ItemGroup>
   <PropertyGroup>

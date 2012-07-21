@@ -32,6 +32,13 @@
     <DocumentationFile>bin\Release\JSBuilder.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EPPlus">
+      <HintPath>..\packages\EPPlus.3.0.0.2\lib\net20\EPPlus.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Ionic.Zip">
+      <HintPath>..\packages\FSharpExcelTools\Ionic.Zip.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.Build.Utilities.v4.0" />
     <Reference Include="mscorlib" />
@@ -41,6 +48,8 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="StringUtils.fs" />
@@ -48,8 +57,10 @@
     <Compile Include="FileUtils.fs" />
     <Compile Include="SeqExtensions.fs" />
     <Compile Include="References.fs" />
-    <None Include="Script.fsx" />
     <Compile Include="HtmlIncludesTask.fs" />
+    <Compile Include="ExcelReader.fs" />
+    <None Include="packages.config" />
+    <None Include="Script.fsx" />
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>

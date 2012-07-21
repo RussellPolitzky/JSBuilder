@@ -1,5 +1,6 @@
 ﻿namespace HtmlIncludesTask
 
+open References
 open Microsoft.Build.Utilities 
 
 /// Entry point for the build task.
@@ -10,4 +11,5 @@ type public HtmlIncludesTask =
     inherit Task
     new () = {} // Note the parameterless contructor here.
     override this.Execute()=
-        true
+        buildIncludesSectionFor "" "" |> ignore
+        true 

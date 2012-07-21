@@ -9,9 +9,13 @@ open System.Collections.Generic
 open System.IO
 open System
 open System.Linq
+open ExcelReader
 
 [<TestClass>]
 type ``When finding references in JS files``() =
+
+    let testFile = @"C:\srce\TestProjects\FSharpJSBuilder\SampleFiles\JSBuilderConfig.xlsx"
+    let testTab  = @"Includes"
 
     
     [<TestMethod>]        
@@ -195,11 +199,6 @@ Debug/ComplexDepsSampleFiles/a.js"
 <script src=""Debug/SampleFilesAbsRefs/b.js"" type=""text/javascript""></script>
 <script src=""/some/scripta.js"" type=""text/javascript""></script>
 <script src=""Debug/SampleFilesAbsRefs/a.js"" type=""text/javascript""></script>"
-
-
-// Should be able to deal with css in a similar way to how we deal with JavaScript.
-// 
-// Find all css refs in the 
 
 
        

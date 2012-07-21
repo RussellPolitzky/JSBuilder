@@ -1,46 +1,36 @@
 ﻿
-#load "FileUtils.fs"
-#load "StringUtils.fs"
-#load "SeqExtensions.fs"
+#r @"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Xml.Linq.dll"
+#r @"C:\srce\TestProjects\FSharpJSBuilder\JSBuilder\packages\EPPlus.3.0.0.2\lib\net20\EPPlus.dll"
 
 open System.IO
+open OfficeOpenXml
 open System.Text.RegularExpressions
-open FileUtils
-open StringUtils
-open System.Diagnostics
+
+let testFile = @"C:\srce\TestProjects\FSharpJSBuilder\SampleFiles\JSBuilderConfig.xlsx"
+let testTab = @"Includes"
+
+type IncludesConfig = {
+    BuildIncludes            :bool  
+    WebApplicationRootFolder :string    // Absolute path to root folder. 
+    RootScript               :string    // JavaScript application root - all references stem from this.
+    SourceTemplatePath       :string    // HTML template 
+    TargetHTMLFile           :string    // Target for completed template
+    SourceFolders            :string[]  // Folders containing JavaScript source.
+    IgnoreReferenceIn        :string[]  // Disregard any references in these files.
+};
+
+let existingFile = new FileInfo(testFile)
+let package = new ExcelPackage(existingFile)
+let worksheet = package.Workbook.Worksheets.[testTab]
+
+let row cellref =
+    Regex.Match(cellref, @"(\d+)").Groups.[1].Value
+
+worksheet.Cells
+|> Seq.groupBy (fun cell -> cell.Address |> row)
+//|> Seq.iter (fun cell -> printf "%A, Address: %A\r\n" cell.Value cell.Address)
 
 
-let startInfo = new ProcessStartInfo()
-let file1 = "C:\srce\FEF\Source\.gitignore"
-let file2 = "C:\srce\FEF\Source\.gitignore"
-startInfo.FileName <- @"C:\Program Files\Perforce\p4merge.exe"
-startInfo.Arguments <- sprintf "%s %s" file1 file2
-Process.Start(startInfo);
 
-/// Opens a set of files in a diff viewer.
-let openDiff file1 file2 =
-    let startInfo = new ProcessStartInfo()
-    startInfo.FileName <- @"C:\Program Files\Perforce\p4merge.exe"
-    startInfo.Arguments <- sprintf "%s %s" file1 file2
-    Process.Start(startInfo);
-
-// Usage
-//let file1 = "C:\srce\FEF\Source\.gitignore"
-//let file2 = "C:\srce\FEF\Source\.gitignore"
-openDiff file1 file2 
-
-let stringsDiffer s1 s2 = 
-    not (s1 = s1)
-
-let _testStrings (tester:string->string->bool) s1 s2 = 
-    Debugger.Launch() |> ignore
-    if (tester s1 s2)
-    then
-        let tempFiles = [| Path.GetTempFileName(); Path.GetTempFileName() |] 
-        Array.zip tempFiles [| s1; s2 |] 
-        |> Array.iter (fun tpl -> File.WriteAllText((fst tpl), (snd tpl)))
-        openDiff tempFiles.[0] tempFiles.[1] |> ignore
-        
-let testStrings = _testStrings stringsDiffer
-
-testStrings "this" "that" 
+//worksheet.Cells
+//|> Seq.groupBy (fun cell -> cell.Address)

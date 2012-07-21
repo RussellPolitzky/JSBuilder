@@ -41,7 +41,6 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <Content Include="ComplexDepsSampleFiles\a.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -91,28 +90,52 @@
     <Content Include="SampleFilesAbsRefs\subdir\g.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="SampleFilesCircularRef\a.js">
+    <Content Include="SampleFilesCircularRefs\a.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SampleFilesCircularRef\b.js">
+    <Content Include="SampleFilesCircularRefs\b.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SampleFilesCircularRef\c.js">
+    <Content Include="SampleFilesCircularRefs\c.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SampleFilesCircularRef\d.js">
+    <Content Include="SampleFilesCircularRefs\d.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SampleFilesCircularRef\e.js">
+    <Content Include="SampleFilesCircularRefs\e.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SampleFilesCircularRef\f.js">
+    <Content Include="SampleFilesCircularRefs\f.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SampleFilesCircularRef\h.js">
+    <Content Include="SampleFilesCircularRefs\h.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SampleFilesCircularRef\subdir\g.js">
+    <Content Include="SampleFilesCircularRefs\subdir\g.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Styles\SampleFilesCircularRef\a.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Styles\SampleFilesCircularRef\b.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Styles\SampleFilesCircularRef\c.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Styles\SampleFilesCircularRef\d.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Styles\SampleFilesCircularRef\e.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Styles\SampleFilesCircularRef\f.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Styles\SampleFilesCircularRef\h.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Styles\SampleFilesCircularRef\subdir\g.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="JsTestFile.js">
@@ -146,6 +169,11 @@
     <Content Include="Styles\ssc.css" />
     <Content Include="Styles\ssb.css" />
     <Content Include="Styles\ssa.css" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="JSBuilderConfig.xlsx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -43,6 +43,9 @@
     </Compile>
     <Compile Include="PathUtilsTests.fs" />
     <Compile Include="ReferenceTests.fs" />
+    <Compile Include="ConfigurationTests.fs">
+      <SubType>Test</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SampleFiles\SampleFiles.csproj">
