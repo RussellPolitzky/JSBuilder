@@ -18,9 +18,10 @@ let extractFromLinesInFile (refRegex:Regex) (groupName:string) fileName =
 
 
 /// Regex to find the references in JavaScript files.
-let private jsReferenceRegex = new Regex(
-                                  @"^/// <reference path=""(?<ref>[^""]*)""", 
-                                  RegexOptions.IgnoreCase ||| RegexOptions.Multiline ||| RegexOptions.RightToLeft);
+let private jsReferenceRegex = 
+    new Regex(
+        @"^/// <reference path=""(?<ref>[^""]*)""", 
+        RegexOptions.IgnoreCase ||| RegexOptions.Multiline ||| RegexOptions.RightToLeft);
 
 
 /// Get all references in a given js file.
