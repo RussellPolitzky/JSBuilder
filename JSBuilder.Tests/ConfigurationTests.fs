@@ -14,10 +14,10 @@ type ConfigurationTests() =
 
     [<TestMethod>]        
     member this.``read configuration for js includes``() =
-        readRowsFrom testFile testTab 
-        |> Seq.map (fun i -> sprintf "%A" i)
-        |> toSingleSringWithSep Environment.NewLine
-        |> IsSameStringAs @"{BuildIncludes = true;
+        let a = readIncludesConfig testFile testTab 
+                |> Seq.map (fun i -> sprintf "%A" i)
+                |> toSingleSringWithSep Environment.NewLine
+        a |> IsSameStringAs @"{BuildIncludes = true;
  WebApplicationRootFolder = ""WebProject"";
  RootScript = ""Tests\alltests.js"";
  SourceTemplatePath = ""WebProject\Templates"";
