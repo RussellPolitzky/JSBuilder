@@ -62,8 +62,8 @@ let inline private _readConfigFrom transformToConfigItem fileName (tabName:strin
 
 /// Reads rows from the given Excel sheet and tab 
 /// and maps them to IncludesConfig items.
-let readIncludesConfig fileName tabName = 
-    _readConfigFrom getIncludesConfigItem fileName tabName // notice injection here.
+let readIncludesConfig = 
+    _readConfigFrom getIncludesConfigItem  // notice injection here.
 
     
                     
