@@ -5,12 +5,12 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>cc8d2a2d-24fc-4cfd-aa74-d0664e968aa5</ProjectGuid>
+    <ProjectGuid>ba8eb3c1-a159-4fd3-94d1-dd18c9b85e10</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>JSBuilder</RootNamespace>
-    <AssemblyName>JSBuilder</AssemblyName>
+    <RootNamespace>FSUtils</RootNamespace>
+    <AssemblyName>FSUtils</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <Name>JSBuilder</Name>
+    <Name>FSUtils</Name>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -20,7 +20,7 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
-    <DocumentationFile>bin\Debug\JSBuilder.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\FSUtils.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -29,18 +29,9 @@
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
-    <DocumentationFile>bin\Release\JSBuilder.XML</DocumentationFile>
+    <DocumentationFile>bin\Release\FSUtils.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EPPlus">
-      <HintPath>..\packages\EPPlus.3.0.0.2\lib\net20\EPPlus.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Ionic.Zip">
-      <HintPath>..\packages\FSharpExcelTools\Ionic.Zip.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Build.Framework" />
-    <Reference Include="Microsoft.Build.Utilities.v4.0" />
     <Reference Include="mscorlib" />
     <Reference Include="FSharp.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <Private>True</Private>
@@ -48,22 +39,12 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="References.fs" />
-    <Compile Include="HtmlIncludesTask.fs" />
-    <Compile Include="ExcelReader.fs" />
-    <None Include="packages.config" />
-    <None Include="Script.fsx" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\FSUtils\FSUtils.fsproj">
-      <Name>FSUtils</Name>
-      <Project>{ba8eb3c1-a159-4fd3-94d1-dd18c9b85e10}</Project>
-      <Private>True</Private>
-    </ProjectReference>
+    <Compile Include="StringUtils.fs" />
+    <Compile Include="SeqExtensions.fs" />
+    <Compile Include="PathUtils.fs" />
+    <Compile Include="FileUtils.fs" />
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>

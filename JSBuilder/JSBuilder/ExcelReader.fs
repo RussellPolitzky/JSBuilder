@@ -54,8 +54,8 @@ let inline private _readConfigFrom transformToConfigItem fileName (tabName:strin
     let row (cellref:string) = Regex.Match(cellref, @"(\d+)"  ).Groups.[1].Value
     let skipHeaderLine = Seq.skip 1 
 
-    use package = new ExcelPackage(new FileInfo(fileName))
-    package.Workbook.Worksheets.[tabName].Cells
+    (new ExcelPackage(new FileInfo(fileName)))
+        .Workbook.Worksheets.[tabName].Cells
     |> Seq.groupBy (fun cell -> cell.Address |> row)
     |> skipHeaderLine
     |> Seq.map(fun gp -> snd gp |> transformToConfigItem)
