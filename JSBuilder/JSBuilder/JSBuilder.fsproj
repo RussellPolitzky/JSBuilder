@@ -59,7 +59,7 @@
     <None Include="Script.fsx" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FSUtils\FSUtils.fsproj">
+    <ProjectReference Include="..\..\FSUtils\FSUtils.fsproj">
       <Name>FSUtils</Name>
       <Project>{ba8eb3c1-a159-4fd3-94d1-dd18c9b85e10}</Project>
       <Private>True</Private>

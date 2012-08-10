@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleFiles", "..\SampleFil
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestWebApplication", "..\TestWebApplication\TestWebApplication.csproj", "{35613168-30F3-4B72-B036-0E86150E1294}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSUtils", "FSUtils\FSUtils.fsproj", "{BA8EB3C1-A159-4FD3-94D1-DD18C9B85E10}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSUtils", "..\FSUtils\FSUtils.fsproj", "{BA8EB3C1-A159-4FD3-94D1-DD18C9B85E10}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
