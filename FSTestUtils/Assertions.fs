@@ -27,6 +27,16 @@ let SameAs (a:'a) (b:'a) =
 let NotSameAs (a:'a) (b:'a) = 
     Assert.AreNotSame(a,b)
 
+/// Wrapper for Assert.IsTrue
+[<DebuggerStepThrough>]
+let IsTrue (a:bool) = 
+    Assert.IsTrue(a)
+
+/// Wrapper for Assert.IsFalse
+[<DebuggerStepThrough>]
+let IsFalse (a:bool) = 
+    Assert.IsFalse(a)
+
 
 /// Ensures that the expected exception is thrown.
 /// Allows the following syntax:

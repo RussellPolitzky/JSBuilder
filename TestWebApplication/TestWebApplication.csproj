@@ -77,6 +77,11 @@
     <Folder Include="Scripts\" />
     <Folder Include="Templates\" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="JSBuilderConfig.xlsx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
@@ -102,9 +107,12 @@
       </FlavorProperties>
     </VisualStudio>
   </ProjectExtensions>
-  <UsingTask TaskName="HtmlIncludesTask" AssemblyFile="..\JSBuilder\JSBuilder\bin\Debug\JSBuilder.dll" />
+  <UsingTask TaskName="HtmlIncludesTask" 
+             AssemblyFile="..\JSBuilder\JSBuilder\bin\Debug\JSBuilder.dll" />
   <Target Name="BeforeBuild">
-    <HtmlIncludesTask />
+    <HtmlIncludesTask 
+        RelativeConfigFilePath="JSBuilderConfig.xlsx" 
+        IncludesTabName="Includes"  />
   </Target>
   <Target Name="AfterBuild">
   </Target>

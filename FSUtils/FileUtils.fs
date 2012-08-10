@@ -17,4 +17,4 @@ type NameAndDirectory = { Name : string; Directory: string }
 let getNameAndDirectory fullPath = 
     let fileInfo = new FileInfo(fullPath)
     { Name = fileInfo.Name; 
-      Directory = fileInfo.DirectoryName}
+      Directory = fileInfo.DirectoryName }

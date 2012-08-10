@@ -31,4 +31,5 @@ type ConfigurationTests() =
  TargetHTMLFile = ""App.html"";
  SourceFolders = [|""jquery.signalR.js""|];
  IgnoreReferenceIn = [||];}"
-        
+
+ 

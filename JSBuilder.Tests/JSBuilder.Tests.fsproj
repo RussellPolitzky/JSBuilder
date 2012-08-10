@@ -45,6 +45,7 @@
     <Compile Include="ConfigurationTests.fs">
       <SubType>Test</SubType>
     </Compile>
+    <Compile Include="IncludesGeneratorTests.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FSTestUtils\FSTestUtils.fsproj">

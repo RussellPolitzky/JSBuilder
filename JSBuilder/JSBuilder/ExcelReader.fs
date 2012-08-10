@@ -15,7 +15,7 @@ type IncludesConfig = {
     mutable TargetHTMLFile           :string    // Target for completed template
     mutable SourceFolders            :string[]  // Folders containing JavaScript source.
     mutable IgnoreReferenceIn        :string[]  // Disregard any references in these files.
-};
+}
 
 
 /// Given range of cells from a row in an 

@@ -1,14 +1,15 @@
 ﻿[<AutoOpen>]
 module PathUtils
 
-open System.Reflection
 open System.IO
 open System.Numerics
 open System
+open System.Text.RegularExpressions
+open System.Reflection
 
 
 /// Given absolute path, this function 
-/// find the nth parent recursing 
+/// finds the nth parent recursing 
 /// upward.
 let moveUp n absoluteDirectory = 
     let rec findParent dir counter =
@@ -35,8 +36,8 @@ let makePathRelativeTo absoluteRootPath absolutePath =
 
 
 /// Transforms a sequence of absolute paths 
-/// to ones relative to the given, absolute relative
-/// path.
+/// to ones relative to the given, absolute 
+/// relative path.
 let makePathsRelativeTo absoluteRootPath (absolutePaths:seq<string>) = 
     let inline isLiteralPath (path:string) =
         not (path.StartsWith("!"))
@@ -45,6 +46,35 @@ let makePathsRelativeTo absoluteRootPath (absolutePaths:seq<string>) =
                     if absolutePath |> isLiteralPath
                     then makePathRelativeTo absolutePath absoluteRootPath
                     else absolutePath.Trim([|'!'|]))
-                    
 
+
+/// Converts the given file URL 
+/// to a standard path.
+let convertFromUrlToStandardPath fileUrl =
+    let pattern = @"^*///(?<Path>.*)$"
+    (Regex.Match(fileUrl, pattern).Groups.["Path"].Value).Replace('/', '\\')
+
+
+/// Gets the codebase of an assembly as a standard path.
+let getCodeBasePathOfAssembly (assembly:Assembly) =
+    Path.GetDirectoryName(convertFromUrlToStandardPath (assembly.CodeBase))    
+
+
+/// Find the absolute directory of a path which 
+/// is a child (rootDirToLookFor) of a parent 
+/// of startDir
+let findParentHavingRoot startDir rootDirToLookFor = 
+    let rec findAbsDirRelativeToStartDir absDir = 
+        let foundDir = 
+            Directory.GetDirectories(absDir)
+            |> Seq.tryFind (fun dir -> dir.EndsWith(rootDirToLookFor))
+        match foundDir with
+        | None     -> findAbsDirRelativeToStartDir (moveUp 0 absDir)
+        | Some dir -> dir
+    findAbsDirRelativeToStartDir startDir
+
+
+/// Wrapper for Path.Combine()
+let combinePaths path1 path2 = 
+    Path.Combine(path1, path2)
 
