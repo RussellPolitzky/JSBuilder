@@ -9,7 +9,7 @@ open System.IO
 open System
 open System.Linq
 open PathUtils
-open ApprovalTests
+
 
 [<TestClass>]
 type ``When manipulating paths``() =
