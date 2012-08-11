@@ -58,6 +58,15 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Index.html" />
+    <Content Include="Tests.html" />
+    <Content Include="Tests\alltests.js" />
+    <Content Include="Tests\b.js" />
+    <Content Include="Tests\c.js" />
+    <Content Include="Tests\d.js" />
+    <Content Include="Tests\e.js" />
+    <Content Include="Tests\f.js" />
+    <Content Include="Tests\h.js" />
+    <Content Include="Tests\subdir\g.js" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -75,12 +84,14 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Scripts\" />
-    <Folder Include="Templates\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="JSBuilderConfig.xlsx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Templates\Tests.template" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -107,12 +118,9 @@
       </FlavorProperties>
     </VisualStudio>
   </ProjectExtensions>
-  <UsingTask TaskName="HtmlIncludesTask" 
-             AssemblyFile="..\JSBuilder\JSBuilder\bin\Debug\JSBuilder.dll" />
+  <UsingTask TaskName="HtmlIncludesTask" AssemblyFile="..\JSBuilder\JSBuilder\bin\Debug\JSBuilder.dll" />
   <Target Name="BeforeBuild">
-    <HtmlIncludesTask 
-        RelativeConfigFilePath="JSBuilderConfig.xlsx" 
-        IncludesTabName="Includes"  />
+    <HtmlIncludesTask RelativeConfigFilePath="JSBuilderConfig.xlsx" IncludesTabName="Includes" />
   </Target>
   <Target Name="AfterBuild">
   </Target>

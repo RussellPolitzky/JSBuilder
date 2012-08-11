@@ -1,18 +1,25 @@
 ﻿module IncludesGenerator
 
-open References
-open ExcelReader
-open PathUtils 
 open System.Reflection
 open System.IO
+open References
+open ExcelReader
+open PathUtils
+open TemplateEngine
 
-
+ 
+/// Populates a template and saves it to the 
+/// target/output file.
 let populateTemplate 
-    (fullPathToTemplate:string) 
-    (includesSection:string) = 
-    // todo: Load up the template and replace the 
-    // {includes} with the calculated deps.
-    ()
+        fullPathToTemplate 
+        fullPathToOutputFile
+        includesSection = 
+    let completedTemplate = 
+        buildTemplateInstance 
+            ([ "jsinclude", includesSection ] |> Map.ofList)
+            (File.ReadAllText(fullPathToTemplate))
+    File.WriteAllText(fullPathToOutputFile, completedTemplate) 
+
 
 /// Processes config to produce a populated
 /// template.  This function requires that 
@@ -20,8 +27,8 @@ let populateTemplate
 /// populator functions be injected and is
 /// not intended to be used directly.
 let _processConfig 
-    (buildIncludesFor:string->string->string) 
-    (templatePopulator:string->string->unit)
+    buildIncludesFor
+    templatePopulator
     (config:IncludesConfig) = 
     if (config.BuildIncludes) then // only process this is asked to do so.
         let absWebApplicationRoot = 
@@ -29,8 +36,10 @@ let _processConfig
                 (getCodeBasePathOfAssembly (Assembly.GetExecutingAssembly())) // should find the web dir from the currently executing assembly
                 config.WebApplicationRootFolder
         let fullTemplatePath = combinePaths absWebApplicationRoot config.SourceTemplatePath
+        let fullOutputPath = combinePaths absWebApplicationRoot config.TargetHTMLFile
         buildIncludesFor config.RootScript absWebApplicationRoot
-        |> templatePopulator fullTemplatePath
+        |> templatePopulator fullTemplatePath fullOutputPath
+
 
 /// Processes config to produce a populated
 /// template.  Takes a single IncludesConfig
@@ -39,6 +48,7 @@ let processConfig =
     _processConfig 
         buildIncludesSectionFor 
         populateTemplate
+
 
 /// Entry point to this build task.
 /// Produces HTML pages with populated 

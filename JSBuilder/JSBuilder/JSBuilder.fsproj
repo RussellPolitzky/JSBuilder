@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="References.fs" />
     <Compile Include="ExcelReader.fs" />
+    <Compile Include="TemplateEngine.fs" />
     <Compile Include="IncludesGenerator.fs" />
     <Compile Include="HtmlIncludesTask.fs" />
     <None Include="packages.config" />

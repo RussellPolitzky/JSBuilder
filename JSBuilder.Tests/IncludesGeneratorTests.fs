@@ -12,7 +12,7 @@ open IncludesGenerator
 type MockIncludesBuilder() = 
        let mutable wasCalled = false
        let mutable _absolutePathToAppDirectory = ""
-       member this.mockIncludesBuilder (pathToRootScript:string) (absolutePathToAppDirectory:string) = 
+       member this.mockIncludesBuilder pathToRootScript absolutePathToAppDirectory = 
               _absolutePathToAppDirectory <- absolutePathToAppDirectory 
               wasCalled <- true 
               "Mock includes"
@@ -24,7 +24,7 @@ type MockIncludesBuilder() =
 type MockTemplatePopulator() = 
        let mutable wasCalled = false
        let mutable _fullPathToTemplate = ""
-       member this.mockTemplatePopulator (fullPathToTemplate:string) (includesSection:string) = 
+       member this.mockTemplatePopulator fullPathToTemplate fullOutputPath includesSection = 
               _fullPathToTemplate <-fullPathToTemplate;  wasCalled <- true; ()
        member x.WasCalled = wasCalled
        member x.FullPathToTemplate = _fullPathToTemplate

@@ -46,6 +46,7 @@
       <SubType>Test</SubType>
     </Compile>
     <Compile Include="IncludesGeneratorTests.fs" />
+    <Compile Include="TemplateEngineTests.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FSTestUtils\FSTestUtils.fsproj">

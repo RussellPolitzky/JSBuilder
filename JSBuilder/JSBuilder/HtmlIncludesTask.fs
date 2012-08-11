@@ -13,6 +13,7 @@ type public HtmlIncludesTask() =
     inherit Task()
     
     // Note the auto-properties here.
+    // Declare and initialise all in one line.
     [<Required>]
     member val RelativeConfigFilePath = "" with get, set
 
@@ -21,7 +22,7 @@ type public HtmlIncludesTask() =
     
     override this.Execute()=
         // Uncomment to debug this build task.
-        //Debugger.Launch() |> ignore
+        Debugger.Launch() |> ignore
 
         try
             processConfigurationsIn  

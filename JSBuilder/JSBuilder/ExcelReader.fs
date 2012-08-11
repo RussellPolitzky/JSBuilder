@@ -42,7 +42,7 @@ let getIncludesConfigItem (cells:seq<ExcelRangeBase>) =
                              | "E" -> config.TargetHTMLFile          <- cell.Value |> toString
                              | "F" -> config.SourceFolders           <- cell.Value |> toString |> split [|';'|]
                              | "G" -> config.SourceFolders           <- cell.Value |> toString |> split [|';'|]
-                             | _ -> ()) // ignore this data since its outside 
+                             | _ -> ()) // ignore this data since its outside of the range of interest.
     config // return 
 
 /// Reads rows from the given Excel sheet and tab and then 
