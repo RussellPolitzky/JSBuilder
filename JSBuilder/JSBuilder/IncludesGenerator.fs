@@ -7,15 +7,6 @@ open System.Reflection
 open System.IO
 
 
-// we assume that the configuration
-// spreadsheet is called JSBuilderConfig.xlsx
-// and that it has a tab called Includes.
-
-// Make these parameters.
-//let configFileName = @"JSBuilderConfig.xlsx"
-//let includesTabName = @"Includes"
-
-
 let populateTemplate 
     (fullPathToTemplate:string) 
     (includesSection:string) = 
