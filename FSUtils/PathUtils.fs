@@ -4,6 +4,7 @@ module PathUtils
 open System.IO
 open System.Numerics
 open System
+open System.Text
 open System.Text.RegularExpressions
 open System.Reflection
 
@@ -62,7 +63,7 @@ let getCodeBasePathOfAssembly (assembly:Assembly) =
 
 /// Find the absolute directory of a path which 
 /// is a child (rootDirToLookFor) of a parent 
-/// of startDir
+/// of startDir.
 let findParentHavingRoot startDir rootDirToLookFor = 
     let rec findAbsDirRelativeToStartDir absDir = 
         let foundDir = 
@@ -78,3 +79,14 @@ let findParentHavingRoot startDir rootDirToLookFor =
 let combinePaths path1 path2 = 
     Path.Combine(path1, path2)
 
+
+/// Directory separator as a string.
+let dirSep = new String([| Path.DirectorySeparatorChar |])
+
+/// Append a path separator
+/// to the given path if it 
+/// doesn't already end with one.
+let appendPathSep (path:string) = 
+    if (path.EndsWith(dirSep))
+    then path
+    else path + dirSep

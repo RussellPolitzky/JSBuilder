@@ -37,7 +37,7 @@ let _processConfig
                 config.WebApplicationRootFolder
         let fullTemplatePath = combinePaths absWebApplicationRoot config.SourceTemplatePath
         let fullOutputPath = combinePaths absWebApplicationRoot config.TargetHTMLFile
-        buildIncludesFor config.RootScript absWebApplicationRoot
+        buildIncludesFor config.RootScript (appendPathSep absWebApplicationRoot)
         |> templatePopulator fullTemplatePath fullOutputPath
 
 

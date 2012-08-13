@@ -139,7 +139,7 @@ let getOrderedScriptPaths pathToRootScript absolutePathToAppDirectory =
 /// in an HTML file for JavaScript.
 let convertPathToJsRefFormat (path:string) = 
     sprintf 
-        @"\t<script src=""%s"" type=""text/javascript""></script>" 
+        "\t<script src=\"%s\" type=\"text/javascript\"></script>" 
         path
 
 
@@ -149,7 +149,7 @@ let convertPathToJsRefFormat (path:string) =
 /// in an HTML file for JavaScript.
 let convertPathToCssRefFormat (path:string) = 
     sprintf 
-        @"\t<link href=""%s"" rel=""stylesheet"" type=""text/css"" />"
+        "\t<link href=\"%s\" rel=\"stylesheet\" type=\"text/css\" />"
         path
         
 
@@ -160,7 +160,7 @@ let convertPathToCssRefFormat (path:string) =
 /// function allowing the user to control the format 
 /// of the output.
 let _buildIncludesSectionFor 
-    (wrapForJsFile:string->string) // inject convertPathToRefFormat here 
+    (wrapForJsFile:string->string)  // inject convertPathToRefFormat here 
     (wrapForCssFile:string->string) // inject convertPathToRefFormat here 
     pathToRootScript 
     absolutePathToAppDirectory =
