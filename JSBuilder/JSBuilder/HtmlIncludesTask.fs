@@ -22,7 +22,7 @@ type public HtmlIncludesTask() =
     
     override this.Execute()=
         // Uncomment to debug this build task.
-        Debugger.Launch() |> ignore
+        //Debugger.Launch() |> ignore
 
         try
             processConfigurationsIn  

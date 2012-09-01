@@ -12,7 +12,7 @@ open IncludesGenerator
 type MockIncludesBuilder() = 
        let mutable wasCalled = false
        let mutable _absolutePathToAppDirectory = ""
-       member this.mockIncludesBuilder pathToRootScript absolutePathToAppDirectory = 
+       member this.mockIncludesBuilder pathToRootScript absolutePathToAppDirectory (filesToIgnore:string[]) = 
               _absolutePathToAppDirectory <- absolutePathToAppDirectory 
               wasCalled <- true 
               "Mock includes"
@@ -53,7 +53,6 @@ type IncludesGeneratorTests() =
                     RootScript               = ""
                     SourceTemplatePath       = @"Templates\Tests.template"
                     TargetHTMLFile           = ""
-                    SourceFolders            = [||]
                     IgnoreReferenceIn        = [||]
                 }
 
@@ -87,7 +86,6 @@ type IncludesGeneratorTests() =
                     RootScript               = ""
                     SourceTemplatePath       = @"Templates\Tests.template"
                     TargetHTMLFile           = ""
-                    SourceFolders            = [||]
                     IgnoreReferenceIn        = [||]
                 }
 
@@ -101,7 +99,7 @@ type IncludesGeneratorTests() =
         mockIncludesBuilder.WasCalled |> IsTrue
         mockTemplatePopulator.WasCalled |> IsTrue
         mockIncludesBuilder.AbsolutePathToAppDirectory
-          |> IsSameStringAs @"C:\srce\TestProjects\FSharpJSBuilder\TestWebApplication"
+          |> IsSameStringAs @"C:\srce\TestProjects\FSharpJSBuilder\TestWebApplication\"
         mockTemplatePopulator.FullPathToTemplate 
           |> IsSameStringAs @"C:\srce\TestProjects\FSharpJSBuilder\TestWebApplication\Templates\Tests.template"
 

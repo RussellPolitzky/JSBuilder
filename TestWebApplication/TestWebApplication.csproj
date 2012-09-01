@@ -58,14 +58,19 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Index.html" />
+    <Content Include="Scripts\app.js" />
+    <Content Include="Scripts\b.js" />
+    <Content Include="Scripts\c.js" />
+    <Content Include="Scripts\d.js" />
+    <Content Include="Scripts\e.js" />
+    <Content Include="Scripts\f.js" />
+    <Content Include="Scripts\h.js" />
+    <Content Include="Scripts\Libs\libWithBadRef.js" />
+    <Content Include="Scripts\subdir\g.js" />
     <Content Include="Tests.html" />
     <Content Include="Tests\alltests.js" />
     <Content Include="Tests\b.js" />
     <Content Include="Tests\c.js" />
-    <Content Include="Tests\d.js" />
-    <Content Include="Tests\e.js" />
-    <Content Include="Tests\f.js" />
-    <Content Include="Tests\h.js" />
     <Content Include="Tests\subdir\g.js" />
     <Content Include="Web.config" />
   </ItemGroup>
@@ -83,7 +88,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Scripts\" />
+    <Content Include="Templates\Index.template" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="JSBuilderConfig.xlsx">

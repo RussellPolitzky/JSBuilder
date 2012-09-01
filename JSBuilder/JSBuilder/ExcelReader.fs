@@ -13,7 +13,6 @@ type IncludesConfig = {
     mutable RootScript               :string    // JavaScript application root - all references stem from this.
     mutable SourceTemplatePath       :string    // HTML template to use for the index page of the web  
     mutable TargetHTMLFile           :string    // Target for completed template
-    mutable SourceFolders            :string[]  // Folders containing JavaScript source.
     mutable IgnoreReferenceIn        :string[]  // Disregard any references in these files.
 }
 
@@ -30,7 +29,6 @@ let getIncludesConfigItem (cells:seq<ExcelRangeBase>) =
                 RootScript               = ""
                 SourceTemplatePath       = ""
                 TargetHTMLFile           = ""
-                SourceFolders            = [||]
                 IgnoreReferenceIn        = [||]
             }
     cells 
@@ -40,8 +38,7 @@ let getIncludesConfigItem (cells:seq<ExcelRangeBase>) =
                              | "C" -> config.RootScript              <- cell.Value |> toString
                              | "D" -> config.SourceTemplatePath      <- cell.Value |> toString
                              | "E" -> config.TargetHTMLFile          <- cell.Value |> toString
-                             | "F" -> config.SourceFolders           <- cell.Value |> toString |> split [|';'|]
-                             | "G" -> config.SourceFolders           <- cell.Value |> toString |> split [|';'|]
+                             | "F" -> config.IgnoreReferenceIn       <- cell.Value |> toString |> split [|';'|]
                              | _ -> ()) // ignore this data since its outside of the range of interest.
     config // return 
 

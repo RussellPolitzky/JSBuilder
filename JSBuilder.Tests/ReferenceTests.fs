@@ -39,7 +39,7 @@ Test/Joyce.js
     //
     [<TestMethod>]        
     member this.``should be able to get full list of refs from tree``() =
-        fst (getAllReferencedFiles @"SampleFiles\a.js")
+        fst (getAllReferencedFiles @"SampleFiles\a.js" [||])
         |> Seq.map (fun i -> Path.GetFileName(i)) 
         |> Seq.toSingleSringWithSep ","
         |> IsSameStringAs @"e.js,f.js,d.js,c.js,h.js,g.js,b.js,a.js"
@@ -60,7 +60,7 @@ Test/Joyce.js
         // then pipe it ot the throwsException function.
         // The lambda takes not args (unit) and returns nothing
         // (unit)
-        (fun () -> fst (getAllReferencedFiles @"SampleFilesCircularRef\a.js")
+        (fun () -> fst (getAllReferencedFiles @"SampleFilesCircularRef\a.js" [||])
                    |> Seq.map (fun i -> Path.GetFileName(i)) 
                    |> Seq.toSingleSringWithSep ","
                    |> Equals "a.js,c.js,e.js,d.js,f.js,b.js,g.js,h.js")
@@ -69,7 +69,7 @@ Test/Joyce.js
 
     // Stub script loader function for testing purposes.
     member this.stubScriptLoader = 
-        (fun rootScript -> 
+        (fun rootScript (fileToIgnore:string[]) -> 
             (["a";"b";"c";"d";"e";"f";"g";"h";"b";"c"], []))
 
 
@@ -86,7 +86,7 @@ Test/Joyce.js
     // in reverse order where only the first instance is mentioed.
     [<TestMethod>]        
     member this.``should get list of scripts in order with only one occurrence of each``() =
-        fst (_getReferencedScriptsInLoadOrder this.stubScriptLoader @"ComplexDepsSampleFiles\a.js")
+        fst (_getReferencedScriptsInLoadOrder this.stubScriptLoader @"ComplexDepsSampleFiles\a.js" [||])
         |> Seq.map (fun i -> Path.GetFileName(i).Replace(".js", "")) 
         |> Seq.toSingleSringWithSep ","
         |> IsSameStringAs @"a,b,c,d,e,f,g,h"
@@ -103,7 +103,7 @@ Test/Joyce.js
     //
     [<TestMethod>]        
     member this.``should be able to get scripts in required load order``() =
-        fst (getReferencedScriptsInLoadOrder @"ComplexDepsSampleFiles\a.js")
+        fst (getReferencedScriptsInLoadOrder @"ComplexDepsSampleFiles\a.js" [||])
         |> Seq.map (fun i -> Path.GetFileName(i).Replace(".js", "")) 
         |> Seq.toSingleSringWithSep ","
         |> IsSameStringAs "f,h,e,d,c,g,b,a"
@@ -132,7 +132,7 @@ Debug/ComplexDepsSampleFiles/a.js"
         let absoluteAppRootPath = 
             (Path.GetFullPath pathToRootScript)
               .Replace(@"\" + pathToRootScript, String.Empty)
-        fst (getOrderedScriptPaths pathToRootScript absoluteAppRootPath)
+        fst (getOrderedScriptPaths pathToRootScript absoluteAppRootPath [||])
         |> Seq.toSingleSringWithSep "\r\n"
         |> IsSameStringAs expected
 
@@ -152,15 +152,15 @@ Debug/ComplexDepsSampleFiles/a.js"
         let absoluteAppRootPath = 
             (Path.GetFullPath pathToRootScript)
               .Replace(@"\" + pathToRootScript, String.Empty)
-        buildIncludesSectionFor pathToRootScript absoluteAppRootPath
-        |> IsSameStringAs @"<script src=""Debug/ComplexDepsSampleFiles/f.js"" type=""text/javascript""></script>
-<script src=""Debug/ComplexDepsSampleFiles/h.js"" type=""text/javascript""></script>
-<script src=""Debug/ComplexDepsSampleFiles/e.js"" type=""text/javascript""></script>
-<script src=""Debug/ComplexDepsSampleFiles/d.js"" type=""text/javascript""></script>
-<script src=""Debug/ComplexDepsSampleFiles/c.js"" type=""text/javascript""></script>
-<script src=""Debug/ComplexDepsSampleFiles/subdir/g.js"" type=""text/javascript""></script>
-<script src=""Debug/ComplexDepsSampleFiles/b.js"" type=""text/javascript""></script>
-<script src=""Debug/ComplexDepsSampleFiles/a.js"" type=""text/javascript""></script>"   
+        buildIncludesSectionFor pathToRootScript absoluteAppRootPath [||]
+        |> IsSameStringAs @"	<script src=""Debug/ComplexDepsSampleFiles/f.js"" type=""text/javascript""></script>
+	<script src=""Debug/ComplexDepsSampleFiles/h.js"" type=""text/javascript""></script>
+	<script src=""Debug/ComplexDepsSampleFiles/e.js"" type=""text/javascript""></script>
+	<script src=""Debug/ComplexDepsSampleFiles/d.js"" type=""text/javascript""></script>
+	<script src=""Debug/ComplexDepsSampleFiles/c.js"" type=""text/javascript""></script>
+	<script src=""Debug/ComplexDepsSampleFiles/subdir/g.js"" type=""text/javascript""></script>
+	<script src=""Debug/ComplexDepsSampleFiles/b.js"" type=""text/javascript""></script>
+	<script src=""Debug/ComplexDepsSampleFiles/a.js"" type=""text/javascript""></script>"
 
 
     //
@@ -183,22 +183,22 @@ Debug/ComplexDepsSampleFiles/a.js"
         let absoluteAppRootPath = 
             (Path.GetFullPath pathToRootScript)
               .Replace(@"\" + pathToRootScript, String.Empty)
-        buildIncludesSectionFor pathToRootScript absoluteAppRootPath
-        |> IsSameStringAs @"<link href=""Styles/c.css"" rel=""stylesheet"" type=""text/css"" />
-<link href=""Debug/Styles/b.css"" rel=""stylesheet"" type=""text/css"" />
-<link href=""Debug/Styles/a.css"" rel=""stylesheet"" type=""text/css"" />
-<link href=""Debug/Styles/h.css"" rel=""stylesheet"" type=""text/css"" />
-<script src=""Debug/SampleFilesAbsRefs/f.js"" type=""text/javascript""></script>
-<script src=""http://www.test.com/thisscript.js"" type=""text/javascript""></script>
-<script src=""Debug/SampleFilesAbsRefs/h.js"" type=""text/javascript""></script>
-<script src=""Debug/SampleFilesAbsRefs/e.js"" type=""text/javascript""></script>
-<script src=""Debug/SampleFilesAbsRefs/d.js"" type=""text/javascript""></script>
-<script src=""Debug/SampleFilesAbsRefs/c.js"" type=""text/javascript""></script>
-<script src=""/some/scriptg.js"" type=""text/javascript""></script>
-<script src=""Debug/SampleFilesAbsRefs/subdir/g.js"" type=""text/javascript""></script>
-<script src=""Debug/SampleFilesAbsRefs/b.js"" type=""text/javascript""></script>
-<script src=""/some/scripta.js"" type=""text/javascript""></script>
-<script src=""Debug/SampleFilesAbsRefs/a.js"" type=""text/javascript""></script>"
+        buildIncludesSectionFor pathToRootScript absoluteAppRootPath [||]
+        |> IsSameStringAs @"	<link href=""Styles/c.css"" rel=""stylesheet"" type=""text/css"" />
+	<link href=""Debug/Styles/b.css"" rel=""stylesheet"" type=""text/css"" />
+	<link href=""Debug/Styles/a.css"" rel=""stylesheet"" type=""text/css"" />
+	<link href=""Debug/Styles/h.css"" rel=""stylesheet"" type=""text/css"" />
+	<script src=""Debug/SampleFilesAbsRefs/f.js"" type=""text/javascript""></script>
+	<script src=""http://www.test.com/thisscript.js"" type=""text/javascript""></script>
+	<script src=""Debug/SampleFilesAbsRefs/h.js"" type=""text/javascript""></script>
+	<script src=""Debug/SampleFilesAbsRefs/e.js"" type=""text/javascript""></script>
+	<script src=""Debug/SampleFilesAbsRefs/d.js"" type=""text/javascript""></script>
+	<script src=""Debug/SampleFilesAbsRefs/c.js"" type=""text/javascript""></script>
+	<script src=""/some/scriptg.js"" type=""text/javascript""></script>
+	<script src=""Debug/SampleFilesAbsRefs/subdir/g.js"" type=""text/javascript""></script>
+	<script src=""Debug/SampleFilesAbsRefs/b.js"" type=""text/javascript""></script>
+	<script src=""/some/scripta.js"" type=""text/javascript""></script>
+	<script src=""Debug/SampleFilesAbsRefs/a.js"" type=""text/javascript""></script>"
 
 
        

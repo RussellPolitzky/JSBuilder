@@ -6,6 +6,7 @@ open System.IO
 open System.Text.RegularExpressions
 open System.Linq
 open PathUtils
+open StringUtils
 
 
 /// Get all references in a given js file.
@@ -40,10 +41,17 @@ type private Accumulator = { js : List<string>; css: List<string> }
 /// files by walking the dependency tree defined by
 /// the references found in each file.  The user 
 /// specifies the root script. 
-let private _getAllReferencedFiles (refFinder:string -> string[]) rootFile = 
+let private _getAllReferencedFiles 
+    (refFinder:string -> string[]) 
+    rootFile 
+    (ignoreReferencesInFiles:string[]) = 
 
-    let (|ABSOLUTE|RELATIVE|) (path:string) = if path.StartsWith("!") then ABSOLUTE(path) else RELATIVE(path)
-    let (|CSS|JS|) (path:string) = if path.ToLower().EndsWith(".css") then CSS(path) else JS(path)
+    let mustBeIgnored fileName = 
+        ignoreReferencesInFiles |> Array.exists (fun thisfileName -> fileName |> endsWith thisfileName)
+
+    let (|IGNORE|CONSIDER|) (path:string) = if (mustBeIgnored path) then IGNORE(path) else CONSIDER(path)
+    let (|ABSOLUTE|RELATIVE|) (path:string) = if path |> startsWith "!"  then ABSOLUTE(path) else RELATIVE(path)
+    let (|CSS|JS|) (path:string) = if path.ToLower() |> endsWith ".css" then CSS(path) else JS(path)
 
     let testForCircularReference pathStack = 
         if pathStack |> Seq.hasDuplicates
@@ -61,15 +69,21 @@ let private _getAllReferencedFiles (refFinder:string -> string[]) rootFile =
         |> Array.rev // Ensure that the refs in a given file appear in the final list in the order given
         |> Array.fold (fun (acc:Accumulator) relPathToDep -> 
                            match relPathToDep with
-                           | CSS(pth) ->  match pth with 
-                                             | RELATIVE(path) -> let absCssPath = calculatePath rootpth pth
-                                                                 {js=acc.js; css=(absCssPath::acc.css)}
-                                             | ABSOLUTE(path) -> {js=acc.js; css=(       pth::acc.css)}
-                           | JS(pth) ->  match pth with
-                                             | ABSOLUTE(path)  -> {js=(pth::acc.js); css=acc.css}
-                                             | RELATIVE(path)  -> let fullPath   = calculatePath rootpth pth
-                                                                  let nameAndDir = getNameAndDirectory fullPath
-                                                                  _getAllReferencedFiles (fullPath::acc.js) acc.css newPathList nameAndDir.Directory nameAndDir.Name) 
+                           | CSS(pth) -> match pth with 
+                                         | RELATIVE(path) -> let absCssPath = calculatePath rootpth pth
+                                                             {js=acc.js; css=(absCssPath::acc.css)}
+                                         | ABSOLUTE(path) -> {js=acc.js; css=(       pth::acc.css)}
+                           | JS(pth)  -> match pth with
+                                         | IGNORE(pt) ->   match pt with
+                                                           | ABSOLUTE(path)  -> {js=(path::acc.js); css=acc.css}
+                                                           | RELATIVE(path)  -> let fullPath = calculatePath rootpth pth
+                                                                                {js=(fullPath::acc.js); css=acc.css}
+                                         | CONSIDER(pt) -> match pt with
+                                                           | ABSOLUTE(path)  -> {js=(path::acc.js); css=acc.css}
+                                                           | RELATIVE(path)  -> let fullPath   = calculatePath rootpth pth
+                                                                                let nameAndDir = getNameAndDirectory fullPath
+                                                                                _getAllReferencedFiles (fullPath::acc.js) acc.css newPathList nameAndDir.Directory nameAndDir.Name) 
+                                        
                       { js=jsFilesList ; css=cssFilesList } // fold seed
     
     let nameAndDir  = getNameAndDirectory rootFile
@@ -80,8 +94,8 @@ let private _getAllReferencedFiles (refFinder:string -> string[]) rootFile =
 /// Gets a list of all referenced files
 /// from the given root.  Note the partial 
 /// application and the DI again here.
-let getAllReferencedFiles pathToRootScript = 
-    let filesAccumulator = _getAllReferencedFiles getReferencesInFile pathToRootScript
+let getAllReferencedFiles pathToRootScript ignoreReferencesInFiles = 
+    let filesAccumulator = _getAllReferencedFiles getReferencesInFile pathToRootScript ignoreReferencesInFiles
     filesAccumulator.js, filesAccumulator.css
 
 
@@ -93,8 +107,9 @@ let getAllReferencedFiles pathToRootScript =
 /// directly and it allows injection of a
 /// reference file loader function for testing.
 let _getReferencedScriptsInLoadOrder 
-    (refFileLoader:string->(List<string> * List<string>) )
-    (pathToRootScript:string) = 
+    (refFileLoader:string->string[]->(List<string> * List<string>))
+    (pathToRootScript:string) 
+    (ignoreReferencesInFiles:string[]) = 
 
     // Removes duplicates preserving 
     // the first occurrence.
@@ -111,7 +126,7 @@ let _getReferencedScriptsInLoadOrder
         |> List.ofSeq        
         |> List.rev
     
-    let (jsFiles, cssFiles) = refFileLoader pathToRootScript
+    let (jsFiles, cssFiles) = refFileLoader pathToRootScript ignoreReferencesInFiles
     (jsFiles  |> removeDuplicates,
      cssFiles |> orderFilesAndRemoveDuplicates)
     
@@ -120,15 +135,15 @@ let _getReferencedScriptsInLoadOrder
 /// required load order from the set of 
 /// those refrenced by the tree formed 
 /// by the references in each file.
-let getReferencedScriptsInLoadOrder pathToRootScript = 
-    _getReferencedScriptsInLoadOrder getAllReferencedFiles pathToRootScript
+let getReferencedScriptsInLoadOrder pathToRootScript ignoreReferencesInFiles = 
+    _getReferencedScriptsInLoadOrder getAllReferencedFiles pathToRootScript ignoreReferencesInFiles
     
 
 /// Gets a list of all required includes in 
 /// the correct order and makes their paths 
 /// relative to the given absolutePathToAppDirectory.
-let getOrderedScriptPaths pathToRootScript absolutePathToAppDirectory = 
-    let (jsFiles, cssFiles) = getReferencedScriptsInLoadOrder pathToRootScript
+let getOrderedScriptPaths pathToRootScript absolutePathToAppDirectory ignoreReferencesInFiles = 
+    let (jsFiles, cssFiles) = getReferencedScriptsInLoadOrder pathToRootScript ignoreReferencesInFiles
     (jsFiles |> makePathsRelativeTo absolutePathToAppDirectory, 
        cssFiles |> makePathsRelativeTo absolutePathToAppDirectory)
 
@@ -163,8 +178,9 @@ let _buildIncludesSectionFor
     (wrapForJsFile:string->string)  // inject convertPathToRefFormat here 
     (wrapForCssFile:string->string) // inject convertPathToRefFormat here 
     pathToRootScript 
-    absolutePathToAppDirectory =
-    let (jsFiles, cssFiles) = getOrderedScriptPaths pathToRootScript absolutePathToAppDirectory
+    absolutePathToAppDirectory
+    ignoreReferencesInFiles =
+    let (jsFiles, cssFiles) = getOrderedScriptPaths pathToRootScript absolutePathToAppDirectory ignoreReferencesInFiles
     (jsFiles  |> Seq.map (fun path -> path |> wrapForJsFile),
      cssFiles |> Seq.map (fun path -> path |> wrapForCssFile))
 
@@ -172,13 +188,14 @@ let _buildIncludesSectionFor
 /// Builds the includes section for the JavaScript scripts
 /// in the tree defined by the references in the given
 /// root script and and its references dependencies.
-let buildIncludesSectionFor pathToRootScript absolutePathToAppDirectory = 
+let buildIncludesSectionFor pathToRootScript absolutePathToAppDirectory ignoreReferencesInFiles = 
     let (jsSection, cssSection) = 
         _buildIncludesSectionFor 
           convertPathToJsRefFormat // injected converter function
           convertPathToCssRefFormat // injected converter function
           pathToRootScript
           absolutePathToAppDirectory
+          ignoreReferencesInFiles
     let cssIncludes = (cssSection |> Seq.toSingleSringWithSep Environment.NewLine)
     let jsIncludes = (jsSection |> Seq.toSingleSringWithSep Environment.NewLine)
     if (cssIncludes = "") 

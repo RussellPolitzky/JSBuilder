@@ -1,1 +1,1 @@
-﻿/// <reference path="subdir/g.js" />
+﻿/// <reference path="../Scripts/d.js" />

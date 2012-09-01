@@ -30,14 +30,14 @@ let _processConfig
     buildIncludesFor
     templatePopulator
     (config:IncludesConfig) = 
-    if (config.BuildIncludes) then // only process this is asked to do so.
+    if (config.BuildIncludes) then // only process this if asked to do so.
         let absWebApplicationRoot = 
             findParentHavingRoot 
                 (getCodeBasePathOfAssembly (Assembly.GetExecutingAssembly())) // should find the web dir from the currently executing assembly
                 config.WebApplicationRootFolder
         let fullTemplatePath = combinePaths absWebApplicationRoot config.SourceTemplatePath
         let fullOutputPath = combinePaths absWebApplicationRoot config.TargetHTMLFile
-        buildIncludesFor config.RootScript (appendPathSep absWebApplicationRoot)
+        buildIncludesFor config.RootScript (appendPathSep absWebApplicationRoot) config.IgnoreReferenceIn
         |> templatePopulator fullTemplatePath fullOutputPath
 
 
